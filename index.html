@@ -1,0 +1,1134 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>HRW133 Certamen 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* Layout: a single "video player" — 1280x720 stage scaled to fit, captions + chapters below. Single deliberate dark look. */
+:root{
+  --bg:#060608; --bg2:#0d0d12; --bg3:#15151c; --grid:rgba(190,185,255,.05);
+  --line:#7d7b88; --line2:#44434d; --ink:#eeedf3; --dim:#9a98a6; --faint:#5e5c68;
+  --acc:#b48cff; --acc-soft:rgba(180,140,255,.12);
+  --peso:#57d4c2; --normal:#eeedf3; --roce:#ff6b7d; --ten:#b48cff; --ela:#f4b55c; --acel:#ff8fd0; --vel:#8fc7ff;
+  --K:#b48cff; --Ug:#57d4c2; --Ue:#f4b55c;
+  --f-disp:'Archivo',ui-sans-serif,system-ui,sans-serif;
+  --f-body:'Figtree',ui-sans-serif,system-ui,sans-serif;
+  --f-math:'STIX Two Text','Cambria Math',Cambria,Georgia,serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.top .kick{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+.top h1{font-family:var(--f-disp);font-stretch:112%;font-weight:800;font-size:clamp(22px,3.2vw,32px);letter-spacing:-.01em;margin:4px 0 0;text-wrap:balance}
+.top p{margin:0;color:var(--dim);font-size:14px;font-family:var(--f-mono)}
+
+#player{background:#000;border-radius:14px;overflow:hidden;border:1px solid #1c1b23;position:relative}
+#player:fullscreen{border-radius:0;border:0;display:flex;flex-direction:column;justify-content:center;background:#000}
+#frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg);margin:0 auto;max-width:100%}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 35%,rgba(0,0,0,.78) 100%),
+    linear-gradient(var(--grid) 2px,transparent 2px) 0 0/80px 80px,
+    linear-gradient(90deg,var(--grid) 2px,transparent 2px) 0 0/80px 80px,
+    var(--bg);
+  animation:drift 90s linear infinite}
+@keyframes drift{to{background-position:0 0,0 80px,80px 0,0 0}}
+.mark{position:absolute;right:26px;bottom:20px;font-family:var(--f-mono);font-size:15px;letter-spacing:.12em;color:var(--faint);z-index:5}
+
+#big{position:absolute;inset:0;margin:auto;width:116px;height:116px;border-radius:50%;border:2px solid var(--acc);background:rgba(10,8,16,.75);color:var(--ink);cursor:pointer;display:grid;place-items:center;z-index:6;box-shadow:0 0 60px rgba(180,140,255,.35);transition:transform .2s}
+#big:hover{transform:scale(1.06)}
+#big svg{width:44px;height:44px;margin-left:6px}
+#resume{position:absolute;left:50%;bottom:18px;translate:-50% 0;z-index:7;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#resume button{font:600 14px var(--f-body);color:var(--ink);background:rgba(20,18,28,.92);border:1px solid var(--acc);border-radius:999px;padding:8px 14px;cursor:pointer}
+#resume button+button{border-color:#2d2c36;color:var(--dim)}
+
+#ctl{display:flex;flex-direction:column;gap:6px;padding:10px 12px 10px;background:#000}
+#bar{position:relative;height:20px;cursor:pointer;touch-action:none;outline:none}
+#bar .tr{position:absolute;left:0;right:0;top:8px;height:4px;background:#2a2932;border-radius:2px}
+#bar .fill{position:absolute;left:0;top:8px;height:4px;background:var(--acc);border-radius:2px;width:0}
+#bar .knob{position:absolute;top:4px;width:12px;height:12px;border-radius:50%;background:#fff;translate:-50% 0;left:0;box-shadow:0 0 0 3px rgba(180,140,255,.35)}
+#bar .tick{position:absolute;top:8px;width:3px;height:4px;background:#000;translate:-50% 0}
+#bar:focus-visible .tr{outline:2px solid var(--acc);outline-offset:4px}
+#tip{position:absolute;bottom:22px;translate:-50% 0;background:#16151d;border:1px solid #2d2c36;color:var(--ink);font:500 12px var(--f-body);padding:5px 9px;border-radius:7px;white-space:nowrap;pointer-events:none}
+.row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+button.ic{background:none;border:0;color:var(--ink);width:40px;height:36px;border-radius:8px;display:grid;place-items:center;cursor:pointer;padding:0}
+button.ic svg{width:22px;height:22px}
+button.ic:hover{background:#1a1a21}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#time{font-family:var(--f-mono);font-size:13px;color:var(--dim);margin:0 8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#chName{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 120px}
+button.tx{font:600 13px var(--f-mono);color:var(--ink);background:#15151b;border:1px solid #2a2930;border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap}
+button.tx[aria-pressed="true"]{border-color:var(--acc);color:var(--acc)}
+button.tx:disabled{opacity:.45;cursor:not-allowed}
+#cap{padding:16px 20px 18px;background:var(--bg2);border-top:1px solid #1c1b23;min-height:118px}
+#cap .ct{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:6px}
+#cap .cx{font-size:clamp(16px,2.1vw,20px);line-height:1.55;color:var(--ink);max-width:78ch;text-wrap:pretty}
+#player:fullscreen #cap{min-height:0}
+
+section h3{font-family:var(--f-disp);font-stretch:110%;font-weight:800;font-size:20px;margin:6px 0 10px}
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.chs button{text-align:left;background:var(--bg2);border:1px solid #1d1c25;border-radius:10px;padding:12px 14px;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:flex-start;min-width:0}
+.chs button:hover{border-color:#34333e}
+.chs button.on{border-color:var(--acc);background:#120f1b}
+.chs .n{font-family:var(--f-mono);color:var(--faint);font-size:13px;padding-top:2px;font-variant-numeric:tabular-nums}
+.chs .t{font-weight:600;font-size:15px;display:block}
+.chs .s{display:block;color:var(--dim);font-size:13px;margin-top:2px}
+.keys{color:var(--dim);font-size:13px;margin:0}
+kbd,.kb{font-family:var(--f-mono);font-size:.85em;border:1px solid #34333e;border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:#14141a;color:var(--ink)}
+
+[hidden]{display:none!important}
+/* ===== stage content ===== */
+.scene{position:absolute;inset:0;transition:opacity .75s ease,transform 1s cubic-bezier(.2,.8,.2,1),filter .75s ease}
+.scene.pre{opacity:0;transform:scale(1.04) translateY(10px);filter:blur(10px)}
+.scene.out{opacity:0;transform:scale(.97);filter:blur(8px);pointer-events:none}
+.scene svg.art{position:absolute;left:0;top:0;width:1280px;height:720px;overflow:visible}
+.hdr{position:absolute;left:64px;top:42px;right:64px}
+.hdr .tag{font-family:var(--f-mono);font-size:17px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.hdr h2{font-family:var(--f-disp);font-stretch:115%;font-weight:800;font-size:42px;margin:6px 0 0;letter-spacing:-.01em;color:var(--ink);line-height:1.1}
+
+.eq{position:absolute;font-family:var(--f-math);font-size:36px;color:var(--ink);white-space:nowrap;line-height:1.25}
+.eq i{font-style:italic}
+.eq .w{font-family:var(--f-body);font-style:normal;font-size:.68em;color:var(--dim);letter-spacing:.01em}
+.eq sub{font-size:.6em;vertical-align:-.3em;line-height:0;font-style:normal}
+.eq sup{font-size:.6em;vertical-align:.62em;line-height:0}
+.eq.s{font-size:30px}.eq.xs{font-size:25px}.eq.l{font-size:50px}.eq.xl{font-size:70px}
+.eq.dim{color:var(--dim)}.eq.acc{color:var(--acc)}
+.eq.box{border:2px solid var(--acc);border-radius:10px;padding:6px 18px;background:rgba(180,140,255,.07);box-shadow:0 0 40px rgba(180,140,255,.16)}
+.c{translate:-50% 0}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .12em;line-height:1.08;font-size:.9em}
+.fr>span:first-child{border-bottom:.055em solid currentColor;padding:0 .22em .05em}
+.fr>span:last-child{padding:.05em .22em 0}
+.rt{white-space:nowrap}
+.rt>.rad{border-top:.055em solid currentColor;padding:.04em .12em 0;margin-left:.03em;display:inline-block;line-height:1.15}
+.unit{font-style:normal;color:var(--dim)}
+.eq .hl,.eq.hl{color:var(--acc);text-shadow:0 0 24px rgba(180,140,255,.7)}
+.nt{position:absolute;font-family:var(--f-body);font-size:26px;line-height:1.38;color:var(--dim);white-space:normal}
+.nt b{color:var(--ink);font-weight:600}
+.nt.acc{color:var(--acc)}
+.nt i{font-family:var(--f-math)}
+.pill.nc{text-transform:none;letter-spacing:.02em;font-size:18px}
+.pill{position:absolute;font-family:var(--f-mono);font-size:17px;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+.panel{position:absolute;border:1.5px solid var(--line2);border-radius:14px;background:rgba(16,16,22,.72)}
+.node{position:absolute;box-sizing:border-box;border:2px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(12,12,18,.9);font-family:var(--f-disp);font-stretch:108%;font-weight:700;font-size:27px;color:var(--ink);line-height:1.1}
+.node small{display:block;font-family:var(--f-math);font-weight:400;font-size:22px;color:var(--dim);margin-top:6px}
+.node small i{font-style:italic}.node small sub{font-size:.65em}
+.node.acc{border-color:var(--acc);box-shadow:0 0 30px rgba(180,140,255,.18)}
+.li{position:absolute;display:flex;gap:18px;align-items:baseline;font-size:28px;line-height:1.35;color:var(--dim);font-family:var(--f-body)}
+.li .num{font-family:var(--f-mono);font-size:19px;color:var(--acc);border:1.5px solid var(--acc);border-radius:50%;width:38px;height:38px;display:grid;place-items:center;flex:none;transform:translateY(-3px)}
+.li b{color:var(--ink);font-weight:600}
+.li i{font-family:var(--f-math)}
+.hk{position:absolute;font-family:var(--f-mono);font-size:18px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+.hero{position:absolute;font-family:var(--f-disp);font-weight:900;font-stretch:112%;font-size:128px;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+.hsub{position:absolute;font-family:var(--f-body);font-size:31px;color:var(--dim)}
+.card .cnum{position:absolute;left:140px;top:150px;font-family:var(--f-disp);font-weight:900;font-stretch:125%;font-size:150px;line-height:1;color:transparent;-webkit-text-stroke:2px var(--line)}
+.card .csub{position:absolute;left:146px;top:338px;font-family:var(--f-mono);font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+.card .cttl{position:absolute;left:140px;top:372px;font-family:var(--f-disp);font-weight:800;font-stretch:116%;font-size:82px;letter-spacing:-.015em;line-height:1.02;color:var(--ink);max-width:1000px}
+
+/* svg drawing */
+.art .ln{stroke:var(--line);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.art .ln2{stroke:var(--line2);stroke-width:2.2;fill:none}
+.art .dashl{stroke-dasharray:7 9}
+.art .obj{fill:#111117;stroke:#a19faa;stroke-width:3}
+.art .spr{fill:none;stroke:#cfcdd8;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.art .hatch{stroke:var(--line2);stroke-width:2}
+.art text{font-family:var(--f-math);font-size:30px;fill:var(--ink)}
+.art .lab{font-style:italic}
+.art .sm{font-family:var(--f-body);font-size:22px;fill:var(--dim)}
+.art .smacc{font-family:var(--f-body);font-size:22px;fill:var(--acc)}
+.art .arr line{stroke:currentColor;stroke-width:4.5;stroke-linecap:round}
+.art .arr polygon{fill:currentColor}
+.art .arr text{fill:currentColor;font-style:italic;font-size:29px;paint-order:stroke;stroke:#060608;stroke-width:6px}
+.art .dim line{stroke:var(--dim);stroke-width:1.6}
+.art .dim text{fill:var(--dim);font-size:25px;font-style:italic;paint-order:stroke;stroke:#060608;stroke-width:6px}
+.art .ang path{fill:none;stroke:var(--acc);stroke-width:2.2}
+.art .ang text{fill:var(--acc);font-size:26px;font-style:italic}
+.art .dot{fill:var(--ink)}
+
+/* bars (energy diagrams) */
+.bars{position:absolute;width:210px;font-family:var(--f-math)}
+.btl{font-family:var(--f-disp);font-weight:800;font-stretch:110%;font-size:26px;text-align:center;margin-bottom:6px;color:var(--ink)}
+.bcols{height:200px;display:flex;align-items:flex-end;justify-content:center;gap:12px;border-bottom:2px solid var(--line)}
+.bc{width:50px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.bf{width:100%;height:calc(var(--h,0) * 100%);border-radius:4px 4px 0 0;transition:height 1s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 26px -6px currentColor}
+.bv{font-size:20px;color:var(--ink);margin-bottom:4px;white-space:nowrap;min-height:24px}
+.bls{display:flex;justify-content:center;gap:12px;margin-top:6px}
+.bls span{width:50px;text-align:center;font-style:italic;font-size:23px;color:var(--dim)}
+.bls sub{font-size:.62em;font-style:normal}
+.be{text-align:center;font-size:21px;margin-top:4px;color:var(--ink);min-height:28px;white-space:nowrap}
+.be i{font-style:italic}.be sub{font-size:.6em;font-style:normal}.be sup{font-size:.6em}
+.bars.sm .bcols{height:130px}.bars.sm .bc{width:42px}.bars.sm .bls span{width:42px}.bars.sm .btl{font-size:22px}
+
+/* beat-driven visibility */
+.scene [data-b]{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.2,1),filter .4s ease,color .4s ease}
+.scene [data-b].vis{opacity:1;transform:none}
+.scene .draw[data-b]{opacity:1;transform:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.2s cubic-bezier(.6,0,.2,1),opacity .5s ease}
+.scene .draw[data-b].vis{stroke-dashoffset:0}
+.scene .gone,.scene .draw.gone{opacity:0!important}
+.scene g.hl,.scene .node.hl,.scene .pill.hl{filter:drop-shadow(0 0 12px rgba(180,140,255,.8))}
+@media (prefers-reduced-motion:reduce){
+  #stage{animation:none}
+  .scene,.scene [data-b]{transition-duration:.01s!important}
+}
+@media (max-width:560px){
+  #cap{padding:12px 14px 14px}
+  #chName{display:none}
+}
+/* ===== Ética HRW133: author colors + text-first components ===== */
+:root{--sav:#8fc7ff;--cor:#f4b55c;--cs:#ff8fd0;--kan:#57d4c2;--cod:#ff6b7d;--ok:#57d4c2;--bad:#ff6b7d}
+.nd{position:absolute;box-sizing:border-box;border:2px solid var(--line);border-radius:12px;padding:14px 18px;background:rgba(12,12,18,.9);font-family:var(--f-disp);font-stretch:108%;font-weight:700;font-size:26px;color:var(--ink);line-height:1.12}
+.nd small{display:block;font-family:var(--f-body);font-weight:400;font-size:20px;color:var(--dim);margin-top:7px;line-height:1.35}
+.nd small b{color:var(--ink);font-weight:600}
+.nd.glow{box-shadow:0 0 30px -4px currentColor}
+.qt{position:absolute;box-sizing:border-box;font-family:var(--f-math);font-style:italic;font-size:34px;line-height:1.3;color:var(--ink);border-left:4px solid var(--acc);padding:4px 0 4px 26px}
+.qt .who{display:block;font-family:var(--f-mono);font-style:normal;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:12px}
+.bigw{position:absolute;font-family:var(--f-disp);font-weight:900;font-stretch:112%;letter-spacing:-.015em;line-height:1.02;white-space:nowrap}
+.tb{position:absolute;border-collapse:collapse;font-family:var(--f-body);font-size:21px;color:var(--dim);line-height:1.35}
+.tb th,.tb td{border-bottom:1px solid var(--line2);padding:11px 16px;text-align:left;vertical-align:top}
+.tb th{font-family:var(--f-disp);font-stretch:108%;font-weight:800;color:var(--ink);font-size:21px;border-bottom:2px solid var(--line)}
+.tb td:first-child{color:var(--ink);font-weight:600}
+.tb td b{color:var(--ink);font-weight:600}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:15px;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid currentColor;border-radius:999px;padding:3px 10px;vertical-align:middle}
+.scene .nt b{color:var(--ink)}
+.art .ic{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.art .icf{fill:currentColor;stroke:none}
+.art .lbl{font-family:var(--f-body);font-size:22px;fill:var(--dim)}
+.art .lblb{font-family:var(--f-disp);font-weight:800;font-stretch:108%;font-size:26px;fill:var(--ink)}
+.art .lblm{font-family:var(--f-mono);font-size:17px;letter-spacing:.12em;fill:var(--dim)}
+.strike{position:relative}
+.strike::after{content:'';position:absolute;left:-4px;right:-4px;top:52%;height:3px;background:var(--bad);transform:scaleX(var(--s,0));transform-origin:left;transition:transform .7s ease}
+.strike.on::after{--s:1}
+
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><div class="kick">HRW133 · Ética y Argumentación Crítica</div><h1>Certamen 2: la clase completa</h1></div>
+    <p id="dur"></p>
+  </header>
+
+  <div id="player">
+    <div id="frame">
+      <div id="stage"></div>
+      <div class="mark">HRW133</div>
+      <button id="big" aria-label="Reproducir la clase"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg></button>
+      <div id="resume" hidden><button id="bRes"></button><button id="bRes0">Desde el inicio</button></div>
+    </div>
+    <div id="ctl">
+      <div id="bar" tabindex="0" role="slider" aria-label="Progreso de la clase" aria-valuemin="0"><div class="tr"></div><div class="fill"></div><div class="knob"></div><div id="tip" hidden></div></div>
+      <div class="row">
+        <button class="ic" id="bPrev" aria-label="Paso anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+        <button class="ic" id="bPlay" aria-label="Reproducir"><svg viewBox="0 0 24 24" fill="currentColor"><path id="icPlay" d="M7 4.5v15l12-7.5z"/></svg></button>
+        <button class="ic" id="bNext" aria-label="Paso siguiente"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        <span id="time">0:00 / 0:00</span>
+        <span id="chName"></span>
+        <button class="tx" id="bVoice" aria-pressed="false" title="Narración con la voz del navegador">Voz: no</button>
+        <button class="tx" id="bSpeed" title="Velocidad">1×</button>
+        <button class="ic" id="bFs" aria-label="Pantalla completa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+    </div>
+    <div id="cap"><div class="ct" id="capTag"></div><div class="cx" id="capTx"></div></div>
+  </div>
+
+  <section>
+    <h3>Capítulos</h3>
+    <div class="chs" id="chs"></div>
+  </section>
+  <p class="keys">Atajos: <kbd>Espacio</kbd> pausa · <kbd>←</kbd> <kbd>→</kbd> paso anterior o siguiente · <kbd>F</kbd> pantalla completa. Los subtítulos son la narración completa; la voz es opcional.</p>
+</div>
+
+<script>
+/* ================= helpers: math text ================= */
+function fr(a,b){return `<span class="fr"><span>${a}</span><span>${b}</span></span>`}
+function rt(x){return `<span class="rt">√<span class="rad">${x}</span></span>`}
+function M(s){
+  const keep=[];const K=h=>{keep.push(h);return '\u0001'+(keep.length-1)+'\u0001'};
+  s=s.replace(/\{\{(.*?)\}\}/g,(_,a)=>K(`<span class="w">${a}</span>`))
+     .replace(/\[([^\]]+)\]/g,(_,a)=>K(`<span class="unit">${a.replace(/\^(\d)/g,'<sup>$1</sup>')}</span>`))
+     .replace(/_\{([^}]*)\}/g,(_,a)=>K(`<sub>${a}</sub>`))
+     .replace(/_([A-Za-z0-9áéíóú]+)/g,(_,a)=>K(`<sub>${a}</sub>`))
+     .replace(/\^\{([^}]*)\}/g,'<sup>$1</sup>').replace(/\^([0-9]+)/g,'<sup>$1</sup>');
+  s=s.split(/(<[^>]+>)/).map(p=>p[0]==='<'?p:p.replace(/(^|[^A-Za-zÀ-ÿ\u0001])([A-Za-zμωθαδφ])(?![A-Za-zÀ-ÿ])/g,'$1<i>$2</i>')).join('');
+  return s.replace(/\u0001(\d+)\u0001/g,(_,i)=>keep[+i]);
+}
+/* ================= helpers: beat attrs ================= */
+function ab(b){if(b==null||b===false)return '';if(typeof b!=='object')return ` data-b="${b}"`;let s='';if(b.b!=null)s+=` data-b="${b.b}"`;if(b.x!=null)s+=` data-x="${b.x}"`;if(b.d!=null)s+=` data-d="${b.d}"`;if(b.hl!=null)s+=` data-hl="${b.hl}"`;return s}
+const hasB=b=>b!=null&&b!==false&&(typeof b!=='object'||b.b!=null);
+/* ================= helpers: html ================= */
+function Q(x,y,s,b,cls=''){return `<div class="eq ${cls}" style="left:${x}px;top:${y}px"${ab(b)}>${M(s)}</div>`}
+function N(x,y,w,s,b,cls=''){return `<div class="nt ${cls}" style="left:${x}px;top:${y}px;width:${w}px"${ab(b)}>${s}</div>`}
+function P(x,y,s,col,b,c=''){return `<div class="pill ${c}" style="left:${x}px;top:${y}px;color:var(--${col})"${ab(b)}>${s}</div>`}
+function LI(x,y,n,s,b,w=1080){return `<div class="li" style="left:${x}px;top:${y}px;width:${w}px"${ab(b)}><span class="num">${n}</span><span>${s}</span></div>`}
+function node(x,y,w,t,s,b,cls=''){return `<div class="node ${cls}" style="left:${x}px;top:${y}px;width:${w}px"${ab(b)}>${t}<small>${M(s)}</small></div>`}
+function svg(s){return `<svg class="art" viewBox="0 0 1280 720">${s}</svg>`}
+function bars(id,x,y,t,b,cls=''){return `<div class="bars ${cls}" id="${id}" style="left:${x}px;top:${y}px"${ab(b)}><div class="btl">${t}</div><div class="bcols">${['K','Ug','Ue'].map(k=>`<div class="bc"><span class="bv"></span><div class="bf" style="background:var(--${k});color:var(--${k})"></div></div>`).join('')}</div><div class="bls"><span>K</span><span>U<sub>g</sub></span><span>U<sub>e</sub></span></div><div class="be"></div></div>`}
+function setB(r,id,v,lab,e){const el=r.querySelector('#'+id);if(!el)return;el.querySelectorAll('.bc').forEach((c,i)=>{c.style.setProperty('--h',v[i]||0);c.querySelector('.bv').textContent=lab&&lab[i]!=null?lab[i]:''});el.querySelector('.be').innerHTML=e?M(e):''}
+/* ================= helpers: svg ================= */
+const sb=s=>`<tspan font-size="19" dy="7" font-style="normal">${s}</tspan>`;
+function ln(x1,y1,x2,y2,b,c='ln',st=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${c}${hasB(b)&&!/dashl/.test(c)?' draw':''}" pathLength="1"${st?` style="${st}"`:''}${ab(b)}/>`}
+function pth(d,b,c='ln',st=''){return `<path d="${d}" class="${c}${hasB(b)&&!/dashl/.test(c)?' draw':''}" pathLength="1"${st?` style="${st}"`:''}${ab(b)}/>`}
+function cir(cx,cy,r,b,c='ln'){return `<circle cx="${cx}" cy="${cy}" r="${r}" class="${c}${hasB(b)&&!/dashl/.test(c)?' draw':''}" pathLength="1"${ab(b)}/>`}
+function dot(x,y,b,r=6){return `<circle cx="${x}" cy="${y}" r="${r}" class="dot"${ab(b)}/>`}
+function tx(x,y,s,b,cls='',anc='middle'){return `<text x="${x}" y="${y}" text-anchor="${anc}" dominant-baseline="central" class="${cls}"${ab(b)}>${s}</text>`}
+function ageo(x1,y1,x2,y2){const a=Math.atan2(y2-y1,x2-x1),h=17,w=.42;return{a,ex:x2-Math.cos(a)*h*.6,ey:y2-Math.sin(a)*h*.6,pts:`${x2},${y2} ${x2-h*Math.cos(a-w)},${y2-h*Math.sin(a-w)} ${x2-h*Math.cos(a+w)},${y2-h*Math.sin(a+w)}`,lx:x2+Math.cos(a)*26,ly:y2+Math.sin(a)*26}}
+function arr(x1,y1,x2,y2,col,lab,b,lp,st=''){const g=ageo(x1,y1,x2,y2);const [lx,ly]=lp||[g.lx,g.ly];return `<g class="arr" style="color:var(--${col});${st}"${ab(b)}><line x1="${x1}" y1="${y1}" x2="${g.ex}" y2="${g.ey}"/><polygon points="${g.pts}"/>${lab?`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central">${lab}</text>`:''}</g>`}
+function darr(id,col,lab,b){return `<g class="arr" id="${id}" style="color:var(--${col})"${ab(b)}><line/><polygon/>${lab?`<text text-anchor="middle" dominant-baseline="central">${lab}</text>`:''}</g>`}
+function setArr(r,id,x1,y1,x2,y2,lp){const e=r.querySelector('#'+id);if(!e)return;const g=ageo(x1,y1,x2,y2);const l=e.querySelector('line');l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',g.ex);l.setAttribute('y2',g.ey);e.querySelector('polygon').setAttribute('points',g.pts);const t=e.querySelector('text');if(t){const p=lp||[g.lx,g.ly];t.setAttribute('x',p[0]);t.setAttribute('y',p[1])}}
+function blk(x,y,w,h,lab,b,id){return `<g${id?` id="${id}"`:''}${ab(b)}><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" class="obj"/>${lab?tx(x+w/2,y+h/2,lab,null,'lab'):''}</g>`}
+function ball(x,y,r,lab,b,id){return `<g${id?` id="${id}"`:''}${ab(b)}><circle cx="${x}" cy="${y}" r="${r}" class="obj"/>${lab?tx(x,y,lab,null,'lab'):''}</g>`}
+function gnd(x1,x2,y,b,red){let h='';for(let x=x1+12;x<=x2;x+=22)h+=`<line x1="${x}" y1="${y+2}" x2="${x-12}" y2="${y+15}" class="hatch"/>`;return `<g${ab(b)}><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="ln"${red?' style="stroke:var(--roce)"':''}/>${h}</g>`}
+function wall(x,y1,y2,b,side=-1){let h='';for(let y=y1+10;y<=y2;y+=20)h+=`<line x1="${x}" y1="${y}" x2="${x+side*13}" y2="${y+10}" class="hatch"/>`;return `<g${ab(b)}><line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" class="ln"/>${h}</g>`}
+function ceil(x1,x2,y,b){let h='';for(let x=x1+12;x<=x2;x+=22)h+=`<line x1="${x}" y1="${y-2}" x2="${x-12}" y2="${y-15}" class="hatch"/>`;return `<g${ab(b)}><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="ln"/>${h}</g>`}
+function springPts(x1,y1,x2,y2,n=9,w=15){const L=Math.hypot(x2-x1,y2-y1)||1,ux=(x2-x1)/L,uy=(y2-y1)/L,nx=-uy,ny=ux,lead=Math.min(16,L*.12);const p=[[x1,y1],[x1+ux*lead,y1+uy*lead]];const m=2*n;for(let i=0;i<m;i++){const s=lead+(L-2*lead)*(i+.5)/m,sd=(i%2?-1:1)*w;p.push([x1+ux*s+nx*sd,y1+uy*s+ny*sd])}p.push([x2-ux*lead,y2-uy*lead],[x2,y2]);return p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}
+function spr(id,x1,y1,x2,y2,b,n,w){return `<polyline${id?` id="${id}"`:''} class="spr" points="${springPts(x1,y1,x2,y2,n,w)}"${ab(b)}/>`}
+function setSpr(r,id,x1,y1,x2,y2,n,w){const e=r.querySelector('#'+id);if(e)e.setAttribute('points',springPts(x1,y1,x2,y2,n,w))}
+function dim(x1,y1,x2,y2,lab,b,lx,ly){const a=Math.atan2(y2-y1,x2-x1),nx=-Math.sin(a)*9,ny=Math.cos(a)*9;return `<g class="dim"${ab(b)}><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><line x1="${x1-nx}" y1="${y1-ny}" x2="${x1+nx}" y2="${y1+ny}"/><line x1="${x2-nx}" y1="${y2-ny}" x2="${x2+nx}" y2="${y2+ny}"/>${lab?`<text x="${lx??(x1+x2)/2}" y="${ly??(y1+y2)/2}" text-anchor="middle" dominant-baseline="central">${lab}</text>`:''}</g>`}
+function arc(cx,cy,r,a1,a2,lab,b,lr){lr=lr??r+24;const R=Math.PI/180,P=a=>[cx+r*Math.cos(a*R),cy-r*Math.sin(a*R)];const [x1,y1]=P(a1),[x2,y2]=P(a2);const lg=Math.abs(a2-a1)>180?1:0,sw=a2>a1?0:1,am=(a1+a2)/2*R;return `<g class="ang"${ab(b)}><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${lg} ${sw} ${x2.toFixed(1)} ${y2.toFixed(1)}"/>${lab?`<text x="${(cx+lr*Math.cos(am)).toFixed(1)}" y="${(cy-lr*Math.sin(am)).toFixed(1)}" text-anchor="middle" dominant-baseline="central">${lab}</text>`:''}</g>`}
+/* ================= helpers: motion ================= */
+function pick(j,o){let v;for(const k of Object.keys(o).map(Number).sort((a,b)=>a-b))if(k<=j)v=o[k];return v}
+function tween(r,key,dur,fn){r._tw=r._tw||{};const id={};r._tw[key]=id;const t0=performance.now();const e=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;function st(now){if(r._tw[key]!==id)return;const p=Math.min(1,(now-t0)/(dur*1000));fn(e(p));if(p<1)requestAnimationFrame(st)}requestAnimationFrame(st)}
+function animv(r,key,to,dur,fn,instant){r._v=r._v||{};const from=r._v[key];r._v[key]=to;if(instant||from==null){fn(to);return}const isA=Array.isArray(to);tween(r,key,dur,p=>fn(isA?to.map((v,i)=>from[i]+(v-from[i])*p):from+(to-from)*p))}
+function setT(r,id,x,y){const e=r.querySelector('#'+id);if(e)e.setAttribute('transform',`translate(${x},${y})`)}
+
+/* ================= content registry ================= */
+const CHS=[],SC=[];let _ch=null;
+function CH(title,sub,narr){_ch={title,sub,scenes:[],i:CHS.length};CHS.push(_ch);if(narr)S({card:true,title,beats:[narr]})}
+function S(o){o.ch=_ch;o.i=SC.length;SC.push(o);_ch.scenes.push(o)}
+</script>
+<script>
+/* ===================== helpers propios de Ética ===================== */
+function nd(x,y,w,t,s,b,col,cls=''){return `<div class="nd ${cls}" style="left:${x}px;top:${y}px;width:${w}px;${col?`border-color:var(--${col});color:var(--ink)`:''}"${ab(b)}>${col?`<span style="color:var(--${col})">${t}</span>`:t}${s?`<small>${s}</small>`:''}</div>`}
+function QT(x,y,w,t,who,b,col='acc',fs=34){return `<div class="qt" style="left:${x}px;top:${y}px;width:${w}px;border-color:var(--${col});font-size:${fs}px"${ab(b)}>${t}${who?`<span class="who">${who}</span>`:''}</div>`}
+function BIG(x,y,t,b,col='ink',fs=64,cls=''){return `<div class="bigw ${cls}" style="left:${x}px;top:${y}px;color:var(--${col});font-size:${fs}px"${ab(b)}>${t}</div>`}
+function TB(x,y,w,head,rows,bs,fs){let h=`<table class="tb" style="left:${x}px;top:${y}px;width:${w}px${fs?`;font-size:${fs}px`:''}">`;
+  if(head)h+=`<tr${ab(bs&&bs.h!=null?bs.h:null)}>${head.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  rows.forEach((r,i)=>{h+=`<tr${ab(bs&&bs.r?bs.r[i]:null)}>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`});return h+'</table>'}
+function person(x,y,s,col,b,id){return `<g${ab(b)}><g${id?` id="${id}"`:''} transform="translate(${x},${y}) scale(${s})" style="color:var(--${col})"><circle cx="0" cy="-62" r="17" class="ic"/><path d="M-30 0 Q-30 -38 0 -38 Q30 -38 30 0" class="ic"/></g></g>`}
+function termite(x,y,s,b){return `<g${ab(b)}><g transform="translate(${x},${y}) scale(${s})" style="color:var(--dim)"><ellipse cx="0" cy="0" rx="26" ry="11" class="ic"/><circle cx="34" cy="0" r="9" class="ic"/><path d="M41 -5 l10 -9 M41 5 l10 9 M-14 -10 l-6 -12 M0 -11 l0 -13 M14 -10 l6 -12 M-14 10 l-6 12 M0 11 l0 13 M14 10 l6 12" class="ic"/></g></g>`}
+function chip(t,col){return `<span class="chip" style="color:var(--${col})">${t}</span>`}
+const ST=(j,r)=>{r.querySelectorAll('[data-st]').forEach(e=>e.classList.toggle('on',j>=+e.dataset.st))};
+/* balanza: brazo de 260 px a cada lado del pivote */
+function scaleArt(cx,cy,lab1,lab2,b,col1='ink',col2='ink'){
+  const pan=(id,lab,col)=>`<g id="${id}"><line x1="0" y1="0" x2="-55" y2="95" class="ln2"/><line x1="0" y1="0" x2="55" y2="95" class="ln2"/><path d="M-70 95 Q0 140 70 95 Z" class="ic" style="color:var(--${col})"/><text x="0" y="172" text-anchor="middle" class="lblb" style="fill:var(--${col})">${lab}</text></g>`;
+  return `<g${ab(b)}><path d="M${cx-60} ${cy+250} L${cx+60} ${cy+250} M${cx} ${cy+250} L${cx} ${cy}" class="ln"/><g id="beam"><line x1="${cx-260}" y1="${cy}" x2="${cx+260}" y2="${cy}" class="ln" style="stroke-width:5"/></g><circle cx="${cx}" cy="${cy}" r="9" class="dot"/>${pan('panL',lab1,col1)}${pan('panR',lab2,col2)}</g>`}
+function setScale(r,cx,cy,deg){const a=deg*Math.PI/180,dx=260*Math.cos(a),dy=260*Math.sin(a);const bm=r.querySelector('#beam');if(bm)bm.setAttribute('transform',`rotate(${-deg} ${cx} ${cy})`);setT(r,'panL',cx-dx,cy+dy);setT(r,'panR',cx+dx,cy-dy)}
+
+/* ===================== INTRO ===================== */
+CH('Introducción','Cómo usar esta clase',null);
+
+S({noHdr:true,title:'Certamen 2',
+html:`
+<div class="hk" style="left:90px;top:160px" data-b="0">HRW133 · USM · 2do semestre 2026</div>
+<div class="hero" style="left:84px;top:196px" data-b="0" data-d=".15">Certamen 2</div>
+<div class="hsub" style="left:90px;top:362px" data-b="0" data-d=".3">Unidad 2 · Ética</div>
+${N(90,440,620,'<b style="color:var(--sav)">Savater</b> · <b style="color:var(--cor)">Cortina</b> · <b style="color:var(--cs)">Comte-Sponville</b> · <b style="color:var(--kan)">Kant</b> · <b style="color:var(--cod)">Código de los ingenieros</b>',1)}
+${N(90,560,620,'<span class="kb">Espacio</span> pausa &nbsp;·&nbsp; <span class="kb">←</span> <span class="kb">→</span> paso anterior o siguiente &nbsp;·&nbsp; velocidad abajo a la derecha',2)}
+${svg(`
+  ${pth('M1010 640 L1010 470',0,'ln')}
+  ${pth('M1010 470 C1010 400 900 380 860 250',0,'ln','stroke:var(--sav)')}
+  ${pth('M1010 470 C1010 400 1120 380 1160 250',0,'ln','stroke:var(--cs)')}
+  ${person(1010,600,1.15,'ink',0)}
+  <text x="860" y="225" text-anchor="middle" class="lbl" data-b="0">¿esto?</text>
+  <text x="1160" y="225" text-anchor="middle" class="lbl" data-b="0">¿o esto?</text>
+`)}`,
+beats:[
+`Hola. Esta es una clase completa para el certamen dos de Ética y Argumentación Crítica. Vamos a repasar toda la Unidad 2 desde cero, paso a paso, sin saltarnos nada, como si nunca hubieras leído los textos.`,
+`Entran cuatro lecturas: Ética para Amador, de Fernando Savater, capítulos uno a cuatro; ¿Para qué sirve realmente la ética?, de Adela Cortina; el capítulo La moral, de André Comte-Sponville; y el Código de Ética del Colegio de Ingenieros de Chile. Además, una idea de Kant que se vio en clases: la mayoría de edad.`,
+`Al final hacemos un repaso rápido de las doce preguntas del cuestionario preparatorio, que es la mejor pista de lo que te van a preguntar. Pausa con la barra espaciadora cuando quieras, retrocede con la flecha izquierda y cambia la velocidad abajo a la derecha. Si quieres, activa la voz.`]
+});
+
+S({title:'El mapa de la unidad',
+html:`
+${nd(470,300,340,'¿Cómo vivir bien?','la pregunta de fondo',0,'acc','glow')}
+${nd(70,170,320,'Savater','Somos libres: la ética es el arte de vivir bien.',1,'sav')}
+${nd(890,170,320,'Cortina','La ética abarata costos. Ser profesional, no solo técnico.',2,'cor')}
+${nd(70,470,320,'Comte-Sponville','La moral es lo que te exiges a ti mismo, aunque nadie te vea.',3,'cs')}
+${nd(890,470,320,'Kant','Mayoría de edad: atrévete a pensar por ti mismo.',4,'kan')}
+${nd(470,540,340,'Código CIICH','La meta de la ingeniería escrita como normas.',4,'cod')}
+${svg(`${arr(470,330,395,260,'sav','',1)}${arr(810,330,885,260,'cor','',2)}${arr(470,370,395,500,'cs','',3)}${arr(810,370,885,500,'kan','',4)}${arr(640,400,640,532,'cod','',4)}`)}`,
+beats:[
+`Antes de partir, el mapa. Todas las lecturas responden, de distintas formas, a una misma pregunta: ¿cómo debo vivir, y cómo debo actuar? Cada autor tendrá siempre el mismo color, para que lo reconozcas al tiro.`,
+`En celeste, Savater. Su idea central es que somos libres, y que la ética es aprender a usar bien esa libertad para darnos una buena vida.`,
+`En amarillo, Adela Cortina. Para ella la ética no es un lujo: es rentable, porque ahorra dinero y sufrimiento. Y nos pide ser buenos profesionales, no solo buenos técnicos.`,
+`En rosado, Comte-Sponville. La moral es lo que te exiges a ti mismo, incluso si nadie te ve y nadie te va a castigar.`,
+`En turquesa, Kant, con la mayoría de edad: atreverse a pensar por uno mismo. Y en rojo, el Código de Ética de los ingenieros chilenos, que aterriza todo esto en tu futura profesión.`]
+});
+
+/* ===================== 1. ÉTICA Y MORAL ===================== */
+CH('Ética y moral','Savater · Comte-Sponville','Capítulo uno: qué es la ética y en qué se diferencia de la moral. Es la pregunta uno del cuestionario, y la base de todo lo demás.');
+
+S({title:'De dónde viene la palabra «moral»',
+html:`
+${BIG(110,200,'<span style="font-family:var(--f-math);font-style:italic;font-weight:400">mores</span>',0,'sav',120)}
+${N(120,350,420,'en latín: <b>costumbres</b>',0)}
+${svg(arr(560,270,700,270,'line','',1))}
+${P(730,215,'«Debes hacer esto»','ink',1,'nc')}
+${P(730,285,'«Ni se te ocurra hacer aquello»','ink',1,'nc')}
+${nd(120,470,1040,'Pero hay órdenes y costumbres que pueden ser malas','Por muy acostumbradas u ordenadas que estén. La moral no puede ser solo «lo que se hace».',2,'bad')}`,
+beats:[
+`Partamos por la palabra. Moral viene del latín mores, que significa costumbres. Por eso, cuando pensamos en moral, pensamos en lo que se acostumbra hacer en un grupo.`,
+`Y también suena a órdenes: la mayoría de los preceptos morales tienen la forma «debes hacer esto» o «ni se te ocurra hacer aquello».`,
+`Pero Savater advierte algo importante: hay costumbres y órdenes que pueden ser malas, inmorales, por muy acostumbradas u ordenadas que estén. Así que la moral no puede ser solo seguir lo que se hace. Hace falta algo más.`]
+});
+
+S({title:'Moral y ética según Savater',
+html:`
+${nd(80,170,530,'Moral','El conjunto de comportamientos y normas que tú y quienes te rodean aceptan como válidos.',0,'sav')}
+${nd(670,170,530,'Ética','La reflexión sobre <b>por qué</b> los consideramos válidos, comparando con las morales de otras personas.',1,'acc')}
+${nd(80,370,530,'«En las pruebas no se copia»','Una norma que se acepta.',2)}
+${nd(670,370,530,'«¿Por qué no copiar?»','Porque rompe la confianza y me engaño a mí mismo.',2)}
+${N(80,560,1100,'Ojo: Savater aclara la diferencia, pero en el libro usa las dos palabras casi como sinónimos. Para él, ambas son un <b>arte de vivir</b>.',3)}`,
+beats:[
+`Ese algo más es la ética. Savater da la definición técnica. La moral es el conjunto de comportamientos y normas que tú, yo y quienes nos rodean aceptamos como válidos.`,
+`La ética, en cambio, es la reflexión sobre por qué consideramos válidas esas normas, y la comparación con las morales que tienen otras personas. Es dar un paso atrás y preguntar: ¿por qué?`,
+`Un ejemplo. «En las pruebas no se copia» es una norma moral. Preguntarte por qué no se debe copiar, y responder que rompe la confianza y que te engañas a ti mismo, eso ya es ética.`,
+`Un detalle que conviene mencionar en el certamen: Savater aclara la diferencia, pero en el libro usa las dos palabras casi como sinónimos. Para él, ambas son un arte de vivir.`]
+});
+
+S({title:'Dos preguntas',
+html:`
+${P(110,190,'Moral','cs',0)}
+${BIG(110,245,'¿Qué debo hacer?',0,'ink',66)}
+${N(116,330,900,'El conjunto de mis deberes: la ley que me impongo a mí mismo.',0)}
+${P(110,410,'Ética','acc',1)}
+${BIG(110,465,'¿Cómo he de vivir?',1,'ink',66)}
+${N(116,550,680,'El proyecto de una vida buena. Para Comte-Sponville, la pregunta principal de la filosofía.',1)}
+${nd(830,400,370,'Postura para la pregunta 1','Sin ética seguimos normas por costumbre; la ética nos vuelve autónomos.',2,'acc')}`,
+beats:[
+`Comte-Sponville agrega una forma muy clara de verlo, con dos preguntas. La moral responde a la pregunta «¿qué debo hacer?»: es el conjunto de mis deberes.`,
+`Y por encima de todas las preguntas de la filosofía, él pone otra: «¿cómo he de vivir?». Esa es la pregunta de la ética: el proyecto de una vida buena.`,
+`Con eso ya puedes responder la pregunta uno. Explicas: moral son las normas, ética es la reflexión sobre ellas. Das el ejemplo de copiar. Y tomas postura: seguir normas sin pensarlas es vivir por costumbre; la ética es lo que nos vuelve autónomos.`]
+});
+
+/* ===================== 2. LIBERTAD ===================== */
+CH('Somos libres','Savater · cap. 1','Capítulo dos: Savater, capítulo uno, «De qué va la ética». Aquí aparece la palabra más importante de toda la unidad: libertad.');
+
+S({title:'El saber que no te puedes saltar',
+html:`
+${N(90,175,620,'<b>Saberes opcionales</b>: se vive igual sin ellos',0)}
+${P(90,240,'astrofísica','line',0)}${P(270,240,'ebanistería','line',0)}${P(450,240,'béisbol','line',0)}
+${nd(730,170,480,'Saber imprescindible','Qué nos conviene (lo <b>bueno</b>) y qué no (lo <b>malo</b>). Todos intentamos aprenderlo.',1,'sav')}
+${N(90,380,1100,'Pero no siempre es claro:',2)}
+${nd(90,440,520,'Lo malo parece bueno','Mentir destruye la confianza… pero a veces parece útil o hasta un favor.',2,'bad')}
+${nd(680,440,520,'Lo bueno parece malo','Decir siempre la verdad, caiga quien caiga, te puede ganar enemigos.',2,'ok')}`,
+beats:[
+`Savater parte con algo simple. Hay cosas que puedes saber o no saber, a voluntad: astrofísica, ebanistería, las reglas del béisbol. Sin ellas se vive igual.`,
+`Pero hay un saber imprescindible: saber qué nos conviene y qué no. A lo que nos conviene lo llamamos bueno, y a lo que no nos conviene, malo. Todos, sin excepción, intentamos aprender eso.`,
+`El problema es que no siempre es claro. Mentir en general es malo, porque destruye la confianza, pero a veces parece útil. Y decir siempre la verdad, caiga quien caiga, a veces te gana enemigos. Lo malo parece bueno y lo bueno parece malo. Por eso hay que pensar.`]
+});
+
+S({title:'Termitas y Héctor',
+html:`${svg(`
+  ${termite(200,330,1.3,0)}${termite(330,290,1.3,0)}${termite(290,400,1.3,0)}${termite(430,370,1.3,0)}
+  <text x="320" y="480" text-anchor="middle" class="lblb" data-b="0">Termitas-soldado</text>
+  <text x="320" y="515" text-anchor="middle" class="lbl" data-b="2">luchan porque <tspan style="fill:var(--bad)">tienen que</tspan></text>
+  ${ln(640,190,640,560,0,'ln2 dashl')}
+  ${person(900,420,1.3,'sav',1)}
+  <text x="900" y="250" text-anchor="middle" class="lblb" data-b="1">Héctor</text>
+  <text x="900" y="285" text-anchor="middle" class="lbl" data-b="2">sale porque <tspan style="fill:var(--sav)">quiere</tspan></text>
+  ${pth('M900 440 C900 480 800 470 770 560',2,'ln','stroke:var(--sav)')}
+  ${pth('M900 440 C900 480 1000 470 1030 560',2,'ln')}
+  <text x="760" y="590" text-anchor="middle" class="lbl" data-b="2">defender Troya</text>
+  <text x="1040" y="590" text-anchor="middle" class="lbl" data-b="2">huir, fingirse enfermo…</text>
+`)}
+${BIG(640,620,'libertad',3,'sav',50,'c')}`,
+beats:[
+`Ahora un caso dramático. Cuando un elefante derriba un termitero, las termitas obreras lo reconstruyen, y las termitas-soldado salen a frenar a las hormigas enemigas, colgándose de ellas mientras las despedazan. Al final, las obreras cierran el termitero dejándolas afuera.`,
+`Segundo caso. En la Ilíada, Héctor, el mejor guerrero de Troya, espera fuera de las murallas a Aquiles, sabiendo que es más fuerte y que probablemente lo va a matar. Lo hace para defender a su familia y a su ciudad.`,
+`¿Cuál es la diferencia? Las termitas luchan porque tienen que: están programadas, no pueden desertar. Héctor sale porque quiere: podría fingirse enfermo, huir disfrazado o rendirse. Por eso su valor tiene mérito, y por eso Homero cuenta su historia.`,
+`Esa diferencia tiene nombre: libertad. Los animales hacen lo que están programados para hacer, y por eso no los premiamos ni los culpamos. Nosotros podemos decir sí o no.`]
+});
+
+S({title:'Condicionados, pero no determinados',
+html:`
+${nd(70,170,330,'Naturaleza','Necesitamos agua, no lejía. Vamos a morir.',0,'line')}
+${nd(70,320,330,'Cultura','Idioma, educación, tradiciones: nos marcan desde la cuna.',0,'line')}
+${svg(`${arr(405,215,560,300,'line','',0)}${arr(405,365,560,330,'line','',0)}
+  ${person(620,360,1.1,'sav',0)}
+  ${pth('M620 375 C640 300 720 230 800 200',1,'ln','stroke:var(--sav)')}${pth('M620 375 C660 330 740 320 800 320',1,'ln','stroke:var(--sav)')}${pth('M620 375 C660 400 740 430 800 440',1,'ln','stroke:var(--sav)')}`)}
+${N(820,180,400,'nunca hay <b>un solo camino</b>',1)}
+${nd(70,480,560,'No elegimos lo que nos pasa','Dónde nacimos, una enfermedad, que ataquen nuestra ciudad.',2,'line')}
+${nd(660,480,550,'Sí elegimos cómo responder','Obedecer o rebelarse, defender Troya o huir.',2,'sav')}
+${P(70,620,'Pregunta 6: condicionan, pero no determinan','sav',3,'nc')}`,
+beats:[
+`Ojo: Savater no dice que seamos libres de todo. También estamos programados en parte. Por naturaleza: necesitamos agua, no lejía, y vamos a morir. Y por cultura: el idioma, la educación y las tradiciones nos marcan desde la cuna.`,
+`Héctor también estaba condicionado: lo educaron para ser guerrero, amaba a su familia, sabía que lo despreciarían si huía. Y sin embargo, siempre pudo elegir otra cosa. Por mucha programación que tengamos, nunca hay un solo camino.`,
+`De aquí sale la primera aclaración. No somos libres de elegir lo que nos pasa: dónde nacimos, una enfermedad, que ataquen nuestra ciudad. Somos libres de elegir cómo respondemos a lo que nos pasa.`,
+`Esto es justo la pregunta seis. Los factores condicionan, pero no determinan. Ejemplo: dos hermanos criados en el mismo barrio y la misma casa que toman caminos muy distintos. Si nada dependiera de nosotros, no tendría sentido premiar ni culpar a nadie.`]
+});
+
+S({title:'Ser libre no es ser omnipotente',
+html:`
+${nd(70,170,520,'Libertad','Elegir <b>dentro de lo posible</b>.',0,'sav')}
+${nd(70,310,520,'Omnipotencia','Conseguir <b>siempre</b> lo que uno quiere, aunque parezca imposible.',0,'line')}
+${svg(`
+  ${pth('M700 560 L920 230 L1140 560 Z',1,'ln')}
+  ${pth('M790 445 L840 400 L880 410 L920 360',1,'ln','stroke:var(--line2)')}
+  <path d="M920 230 L920 195 L948 205 L920 215" class="ic" style="color:var(--bad)" data-b="1"/>
+  ${person(760,560,.8,'sav',1)}
+  <text x="920" y="610" text-anchor="middle" class="lbl" data-b="1">Querer subir el Everest sin preparación</text>
+`)}
+${nd(70,450,520,'Leer o no leer','Sé leer desde chico: si lo decido, me resulta fácil.',2,'ok')}
+${P(70,610,'Más me conozco y más sé hacer → más rinde mi libertad','sav',3,'nc')}`,
+beats:[
+`La segunda aclaración es la pregunta siete. Ser libre no es lo mismo que ser omnipotente. Libertad es elegir dentro de lo posible. Omnipotencia sería conseguir siempre lo que uno quiere, aunque parezca imposible.`,
+`El ejemplo de Savater: soy libre de querer subir el monte Everest. Pero con mi mal estado físico y sin preparación en alpinismo, es prácticamente imposible que lo logre.`,
+`En cambio, soy libre de leer o no leer, y como aprendí a leer de chico, si decido hacerlo me resulta fácil. Hay cosas que dependen de mi voluntad, y eso es ser libre. Pero no todo depende de mi voluntad, porque en el mundo hay otras voluntades y otras necesidades.`,
+`¿Por qué importa la diferencia? Porque evita dos errores: creer que no somos libres porque no logramos todo, o creer que no tenemos límites. Y deja una lección: mientras más me conozco a mí y al mundo, y más capacidad de acción tengo, más rinde mi libertad.`]
+});
+
+S({title:'La excusa de «no soy libre»',
+html:`
+${N(80,175,560,'«¿Libertad? Si…»',0)}
+${N(80,225,560,'<span class="strike" data-st="1">la tele nos manipula</span>',0)}
+${N(80,270,560,'<span class="strike" data-st="1">los políticos nos engañan</span>',0)}
+${N(80,315,560,'<span class="strike" data-st="1">no me alcanza para la moto</span>',0)}
+${nd(80,400,520,'El alivio escondido','Si no soy libre, no tengo la culpa de nada.',0,'bad')}
+${nd(690,175,510,'La prueba del filósofo romano','Le pega con el bastón a quien niega la libertad… y no para hasta que admite que él <b>podía</b> dejar de pegarle.',2,'sav')}
+${nd(690,420,510,'Conclusión del capítulo','Como podemos elegir, podemos equivocarnos. El saber vivir para acertar se llama <b>ética</b>.',3,'acc')}`,
+on:ST,
+beats:[
+`Mucha gente dice: ¿libertad? Si la tele nos manipula, los políticos nos engañan y no me alcanza la plata para la moto. Savater sospecha que en el fondo eso les alivia: si no son libres, no tienen la culpa de nada.`,
+`Pero nadie cree de verdad que funciona como una termita. A veces decimos que no hay libertad para no reconocer que elegimos lo más fácil. Y por dentro algo nos dice: si tú hubieras querido...`,
+`Savater cuenta la prueba de un filósofo romano. Un amigo le negaba que fuéramos libres. El filósofo tomó su bastón y empezó a pegarle. Cuando el amigo le pidió que parara, el filósofo respondió: ¿no dices que no soy libre? Entonces no me pidas que pare. Solo paró cuando el amigo admitió que sí podía dejar de pegarle.`,
+`Conclusión del capítulo: como podemos inventar y elegir, también podemos equivocarnos, cosa que a las termitas no les pasa. Por eso conviene aprender un saber vivir que nos ayude a acertar. A ese saber vivir, o arte de vivir, se le llama ética.`]
+});
+
+/* ===================== 3. ÓRDENES, COSTUMBRES, CAPRICHOS ===================== */
+CH('Órdenes, costumbres y caprichos','Savater · cap. 2','Capítulo tres: Savater, capítulo dos. ¿Por qué hacemos lo que hacemos? Esta es la base de la pregunta ocho.');
+
+S({title:'El capitán en la tormenta',
+html:`${svg(`
+  <g data-b="0"><g id="wv"><path d="M40 520 Q100 490 160 520 T280 520 T400 520 T520 520 T640 520 T760 520" class="ln2" style="stroke:var(--sav);stroke-width:3"/><path d="M0 560 Q60 530 120 560 T240 560 T360 560 T480 560 T600 560 T720 560" class="ln2" style="stroke:var(--sav);opacity:.6"/></g></g>
+  <g data-b="0"><g id="ship" transform="translate(360,480)">
+    <path d="M-190 0 L190 0 L140 70 L-140 70 Z" class="obj"/>
+    <line x1="0" y1="0" x2="0" y2="-230" class="ln"/>
+    <path d="M6 -220 L150 -40 L6 -40 Z" class="ic" style="color:var(--line)"/>
+    <g id="cargo"><rect x="-150" y="-50" width="60" height="50" rx="4" class="obj"/><rect x="-85" y="-50" width="60" height="50" rx="4" class="obj"/><rect x="-118" y="-98" width="60" height="48" rx="4" class="obj"/></g>
+  </g></g>
+  <path d="M520 190 l-30 55 h28 l-22 60" class="ic" style="color:var(--ela)" data-b="0"/>
+`)}
+${nd(780,170,430,'No elige la tormenta','Eso le <b>pasa</b>, quiera o no.',1,'line')}
+${nd(780,320,430,'Sí elige qué hacer','Tirar la carga o arriesgarse con ella.',1,'sav')}
+${nd(780,470,430,'«Queriendo y sin querer»','Lo que de verdad quiere: llegar a puerto con todo. Es libre en circunstancias que no eligió.',2,'acc')}`,
+on(j,r){animv(r,'cg',j>=2?1:0,1.6,v=>{const c=r.querySelector('#cargo');if(c){c.setAttribute('transform',`translate(${-v*120},${v*150}) rotate(${-v*35})`);c.style.opacity=String(1-v*.85)}})},
+loop(st,r){const s=r.querySelector('#ship');if(s)s.setAttribute('transform',`translate(360,${480+6*Math.sin(st*1.1)}) rotate(${7*Math.sin(st*1.3)})`);const w=r.querySelector('#wv');if(w)w.setAttribute('transform',`translate(${30*Math.sin(st*.8)},0)`)},
+beats:[
+`Savater toma un ejemplo de Aristóteles. Un barco lleva una carga importante de un puerto a otro y lo sorprende una tremenda tempestad. Parece que la única forma de salvar a la tripulación es tirar la carga al mar.`,
+`El capitán no eligió la tormenta: eso le pasa, quiera o no. Lo que sí puede elegir es qué hacer frente a ella: tirar la carga o arriesgarse a seguir con ella.`,
+`Si la tira, ¿quiere tirarla? Sí y no. Lo que de verdad quiere es llegar a puerto con su barco, su gente y su carga. Pero dadas las circunstancias, prefiere salvar las vidas. Lo hace queriendo y, a la vez, sin querer. Es libre de optar en circunstancias que no eligió.`]
+});
+
+S({title:'Tres tipos de motivos',
+html:`
+${N(70,160,1140,'Un <b>motivo</b> es la razón que tienes, o crees tener, para hacer algo: la respuesta a «¿por qué hago esto?».',0)}
+${TB(70,240,1140,['Motivo','Qué es','De dónde saca su fuerza','En la mañana de Amador'],[
+ ['<span style="color:var(--sav)">Orden</span>','Alguien con autoridad te lo manda','Miedo al castigo, esperanza de premio, confianza en quien manda','Levantarse para el colegio porque el padre insiste'],
+ ['<span style="color:var(--sav)">Costumbre</span>','Siempre lo haces, o todos lo hacen','Comodidad de la rutina y presión de los demás (modas)','Ducharse, ponerse pantalones'],
+ ['<span style="color:var(--sav)">Capricho</span>','Te dio la gana, sin más','Sale de dentro, de la pura gana','Ir pateando una lata']],{h:0,r:[1,2,3]})}
+${N(70,610,1140,'Órdenes y costumbres vienen <b>de fuera</b>; los caprichos parecen salir <b>de dentro</b>.',3)}`,
+beats:[
+`Pero casi nunca vivimos en tormenta. La mayoría de lo que hacemos es casi automático. Savater le recuerda a su hijo su mañana: apagó el despertador, se lavó los dientes, se duchó, tomó el bus y fue pateando una lata. ¿Por qué hizo cada cosa? Un motivo es la razón que tienes, o crees tener, para hacer algo.`,
+`Primer tipo: las órdenes. Alguien con autoridad te manda hacerlo, como el padre que insiste en que te levantes para el colegio. Su fuerza viene del miedo al castigo, de la esperanza de un premio, y también de la confianza en quien manda.`,
+`Segundo tipo: las costumbres. Lo haces porque siempre lo haces, o porque todos lo hacen: ducharte, ponerte pantalones, seguir la moda de tus amigos. Su fuerza viene de la comodidad de la rutina y de la presión de los demás.`,
+`Tercer tipo: los caprichos. Lo haces porque te dio la gana, como patear la lata. Las órdenes y las costumbres vienen de fuera; los caprichos parecen salir de dentro, aunque a veces también imitan a alguien o son ganas de llevar la contraria.`]
+});
+
+S({title:'Cuando la cosa es seria, no bastan',
+html:`
+${N(70,165,1140,'En la tormenta: la <b>orden</b> es llevar la carga, la <b>costumbre</b> es no tirarla, y decidir por <b>capricho</b> sería una locura. Hay que <b>inventar</b>.',0)}
+${nd(70,280,360,'Orden','«Cumplí órdenes», dice el comandante nazi. No lo justifica.',1,'bad')}
+${nd(460,280,360,'Costumbre','Que sea habitual discriminar por el color de piel no lo hace aceptable.',2,'bad')}
+${nd(850,280,360,'Capricho','Irse a la playa y dejar solo a un bebé: ya no es simpático, es criminal.',2,'bad')}
+${nd(70,500,1140,'Ninguna acción es buena solo por ser orden, costumbre o capricho','Pero tampoco hay que llevarle la contraria a todo: muchas veces son buenos motivos.',3,'sav','glow')}`,
+beats:[
+`Volvamos al capitán. La orden es llevar la carga a puerto. La costumbre no es tirarla. Y si decidiera por capricho, pensaríamos que está loco. Cuando la cosa es seria, ninguno de los tres basta: hay que inventar la conducta más razonable.`,
+`Savater da tres ejemplos. Orden: el comandante de un campo de concentración nazi que se excusa diciendo que cumplió órdenes. Esa justificación no convence.`,
+`Costumbre: en algunos lugares es costumbre no arrendarle a alguien por su color de piel. Por muy habitual que sea, sigue siendo inaceptable. Capricho: irse a la playa es comprensible, pero dejar solo a un bebé un fin de semana por ese capricho ya es criminal.`,
+`La conclusión: puede haber órdenes, costumbres y caprichos que sean buenos motivos para actuar. Sería tonto llevar la contraria a todo. Pero ninguna acción es buena solo por ser una orden, una costumbre o un capricho.`]
+});
+
+S({title:'Pensar dos veces: la voluntad',
+html:`
+${nd(60,180,330,'1ª vez: ¿por qué hago esto?','Me lo mandan · se acostumbra · me dio la gana.',0,'line')}
+${nd(470,180,340,'2ª vez: ¿y por qué eso?','¿Por qué obedezco? ¿Me conviene esta costumbre? ¿Y este capricho?',1,'sav')}
+${nd(890,180,320,'Voluntad','Decido razonando por mí mismo. Nadie puede ser libre en mi lugar.',2,'acc','glow')}
+${svg(`${arr(395,250,462,250,'line','',1)}${arr(815,250,882,250,'acc','',2)}`)}
+${N(60,400,1150,'Ejemplo para la pregunta 8: <b>usar casco en una obra</b>',3)}
+${TB(60,450,1150,null,[
+ ['Por orden','el jefe lo exige'],['Por costumbre','todos lo usan'],['Por capricho','solo si hoy me dan ganas'],['<span style="color:var(--acc)">Por voluntad</span>','entiendo el riesgo y decido protegerme, aunque nadie me vea']],{r:[3,3,3,3]},20)}`,
+beats:[
+`¿Entonces qué hacemos? Savater propone pensar dos veces. La primera vez que te preguntas por qué haces algo, la respuesta es del tipo que ya vimos: porque me lo mandan, porque se acostumbra, porque me dio la gana.`,
+`La segunda vez preguntas más hondo. ¿Por qué obedezco esta orden: por miedo, por un premio? ¿Y si me mandan algo que no me parece conveniente? ¿Por qué tengo que hacer siempre lo que se suele hacer? ¿Este capricho no se va a volver contra mí?`,
+`Actuar por voluntad es decidir después de esa segunda pregunta, razonando por uno mismo. Savater lo dice así: nadie puede ser libre en tu lugar. Libertad es decidir, pero también darte cuenta de que estás decidiendo.`,
+`Para la pregunta ocho, un ejemplo de ingeniería: usar casco en una obra. Por orden, porque el jefe lo exige. Por costumbre, porque todos lo usan. Por capricho, solo si hoy te dan ganas. Por voluntad, porque entiendes el riesgo y decides protegerte, aunque nadie te vea.`]
+});
+
+/* ===================== 4. HAZ LO QUE QUIERAS ===================== */
+CH('Haz lo que quieras','Savater · cap. 3 y 4','Capítulo cuatro: Savater, capítulos tres y cuatro. Una frase que parece una invitación al desorden: haz lo que quieras. Veremos que significa casi lo contrario.');
+
+S({title:'Hacerse adulto',
+html:`
+${nd(70,180,520,'De niño','Basta obedecer, seguir la rutina o el caprichito: alguien vela por ti.',0,'line')}
+${nd(690,180,520,'De adulto','Ser capaz de <b>inventar</b>, en cierto modo, tu propia vida, y no vivir la que otros inventaron para ti.',1,'sav','glow')}
+${svg(arr(595,240,682,240,'sav','',1))}
+${nd(70,430,1140,'La ética de alguien libre no es de premios y castigos','Quien solo huye del castigo y busca la recompensa que reparten otros es como un esclavo. El palo y la zanahoria sirven para un niño.',2,'bad')}`,
+beats:[
+`Primero, una idea clave. Cuando uno es niño, basta con obedecer, seguir la rutina o darse algún caprichito, porque alguien vela por nosotros. Pero luego hay que hacerse adulto.`,
+`Ser adulto, dice Savater, es ser capaz de inventar en cierto modo tu propia vida, y no simplemente vivir la que otros inventaron para ti. No del todo, porque no vivimos solos, pero entre las órdenes, costumbres y caprichos hay que aprender a elegir.`,
+`Por eso la ética de una persona libre no tiene nada que ver con premios y castigos, vengan de una autoridad humana o divina. Quien solo huye del castigo y busca la recompensa es como un esclavo. El palo y la zanahoria sirven para un niño, no para alguien que ya creció.`]
+});
+
+S({title:'No hay reglamento del buen humano',
+html:`
+${nd(70,180,350,'Buen futbolista','Ayuda a ganar y mete goles.',0,'ok')}
+${nd(465,180,350,'Buena moto','Rápida, estable, resistente.',0,'ok')}
+${nd(860,180,350,'¿Buen ser humano?','No es un instrumento: no hay un solo reglamento.',1,'sav','glow')}
+${N(70,360,1140,'A veces se nos pide <b>obediencia</b> y a veces <b>rebeldía</b>; a veces <b>generosidad</b> y a veces <b>prudencia</b>.',1)}
+${nd(70,470,1140,'Y habría que conocer las intenciones','Alguien puede hacer algo bueno por casualidad, o causar un desastre con la mejor voluntad.',2,'line')}`,
+beats:[
+`Savater se pregunta: ¿por qué no definimos qué es ser una buena persona, igual que definimos un buen futbolista o una buena moto? Un futbolista es bueno si ayuda a ganar y mete goles. Una moto es buena si es rápida y estable.`,
+`El problema es que sabemos para qué sirve un futbolista o una moto, pero el ser humano no es un instrumento para conseguir algo. A veces se nos pide obediencia y a veces rebeldía; a veces generosidad y a veces prudencia. No hay un único reglamento para ser un buen humano.`,
+`Y además, para juzgar a alguien habría que conocer hasta sus intenciones: alguien puede hacer algo bueno por casualidad, o causar un desastre con la mejor voluntad. Así que desde fuera es difícil decidir quién es bueno.`]
+});
+
+S({title:'La abadía de Theleme',
+html:`${svg(`
+  ${pth('M120 640 L120 330 Q120 190 290 190 Q460 190 460 330 L460 640',0,'ln','stroke:var(--sav)')}
+  ${pth('M170 640 L170 345 Q170 245 290 245 Q410 245 410 345 L410 640',0,'ln2')}
+  <text x="290" y="300" text-anchor="middle" class="lblm" data-b="0" style="fill:var(--sav);font-size:19px">HAZ LO QUE</text>
+  <text x="290" y="330" text-anchor="middle" class="lblm" data-b="0" style="fill:var(--sav);font-size:19px">QUIERAS</text>
+`)}
+${N(560,175,650,'François Rabelais, <b>Gargantúa y Pantagruel</b> (siglo XVI). Una sola regla en la puerta.',0)}
+${nd(560,270,650,'No es «vale todo»','Es: deja las órdenes, costumbres y premios de fuera, y pregúntate tú qué hacer con tu vida.',1,'sav')}
+${nd(560,420,650,'Una orden paradójica','Si la obedeces porque te la di, la desobedeces. Si la desobedeces, la cumples. No somos libres de no ser libres.',2,'acc')}
+${QT(560,580,650,'«Estamos condenados a la libertad»','Jean-Paul Sartre',3,'sav',30)}`,
+beats:[
+`Entonces, ¿cómo nos guiamos? Savater responde con algo que sorprende. François Rabelais, un escritor francés del siglo dieciséis, cuenta en Gargantúa y Pantagruel que el gigante Gargantúa funda una abadía, la abadía de Theleme, con una sola regla escrita en la puerta: haz lo que quieras.`,
+`Y Savater dice: en la puerta de la ética bien entendida está escrita esa misma consigna. ¿Significa que vale todo? No. Significa que dejes de buscar órdenes, costumbres y premios de afuera, y que te plantees el asunto desde ti mismo. No le preguntes a otro qué hacer con tu vida: pregúntatelo tú.`,
+`Fíjate en la trampa de la frase. Haz lo que quieras es una orden muy rara: si la cumples porque yo te la di, no estás haciendo lo que tú quieres. Y si la desobedeces, la estás cumpliendo. Esa paradoja muestra algo real: no somos libres de no ser libres.`,
+`Aunque decidas obedecer siempre a otro, eso también lo elegiste tú. Por eso el filósofo Jean-Paul Sartre decía que estamos condenados a la libertad. Para esa condena no hay indulto.`]
+});
+
+S({title:'Querer no es tener ganas: Esaú',
+html:`${svg(scaleArt(640,260,'lentejas · ahora','primogenitura · a la larga',0,'line','sav'))}
+${N(70,600,1140,'Hay que poner <b>prioridades</b> entre lo que me apetece ahora y lo que en el fondo quiero a la larga.',2)}`,
+on(j,r,m){animv(r,'ang',j>=2?-10:j>=1?12:0,1.4,v=>setScale(r,640,260,v),m&&j<1)},
+beats:[
+`Pero cuidado: haz lo que quieras no es haz lo primero que se te ocurra. Para eso Savater cuenta la historia bíblica de Esaú y Jacob, hermanos gemelos. Esaú nació primero, así que tenía la primogenitura: el derecho a heredar todo lo de su padre.`,
+`Un día Esaú vuelve del campo cansado y muerto de hambre. Jacob había cocinado un potaje de lentejas, y se lo ofrece a cambio de la primogenitura. Esaú piensa: la herencia es para mucho después, quizá me muera antes. Y acepta.`,
+`¿Hizo Esaú lo que quería? No. Hizo lo que le apetecía en ese momento. Lo que de verdad quería era la primogenitura, que le iba a mejorar mucho la vida. Las lentejas podían esperar. La lección: hay que poner prioridades entre lo que me apetece ahora y lo que en el fondo quiero a la larga.`]
+});
+
+S({title:'Date la buena vida',
+html:`
+${BIG(70,175,'la buena vida',0,'sav',62)}
+${QT(70,270,560,'La ética es el intento racional de averiguar cómo vivir mejor.','Savater',1,'sav',28)}
+${svg(`
+  ${[[800,260],[960,210],[1120,270],[1110,420],[950,470],[800,410]].map(([x,y],k)=>person(x,y+30,.6,'sav',2)).join('')}
+  ${pth('M800 250 L960 200 L1120 260 L1110 410 L950 460 L800 400 Z M800 250 L1110 410 M960 200 L950 460 M1120 260 L800 400',2,'ln2','stroke:var(--sav);opacity:.5')}
+`)}
+${N(70,430,620,'Nos hacemos humanos <b>unos a otros</b>: darse la buena vida es también <b>dar</b> la buena vida.',2)}
+${nd(70,560,1140,'Ciudadano Kane','Lo tuvo todo y usó a todos. Murió solo diciendo «Rosebud»: el trineo de cuando vivía rodeado de cariño.',3,'line')}`,
+beats:[
+`Entonces, ¿qué es lo que de verdad queremos? Queremos muchas cosas a la vez: una moto, pero sin rompernos la cabeza; amigos, sin perder la independencia; dinero, sin abusar de nadie. Si lo resumimos todo, lo que queremos es darnos la buena vida.`,
+`Y aquí Savater da una definición importantísima: la ética no es más que el intento racional de averiguar cómo vivir mejor. Si vale la pena interesarse por la ética, es porque nos gusta la buena vida.`,
+`Pero una buena vida humana, no la de una coliflor. Y ser humano es tener relaciones con otros. Nadie aprende a hablar solo: nos hacemos humanos unos a otros. Por eso la humanización es recíproca. Si trato a todos como cosas, yo tampoco seré más que una cosa. Darse la buena vida termina siendo lo mismo que dar la buena vida.`,
+`El ejemplo final es la película Ciudadano Kane. Kane junta todas las riquezas del mundo y usa a las personas como herramientas. Muere solo, diciendo Rosebud: el nombre del trineo de su infancia, cuando vivía rodeado de cariño. Eso era lo que de verdad quería. Con esto tienes la pregunta nueve: haz lo que quieras es posible, pero exige pensar qué quieres de verdad y contar con los demás.`]
+});
+
+/* ===================== 5. CORTINA: COSTOS ===================== */
+CH('La ética abarata costos','Cortina','Capítulo cinco: Adela Cortina. Su pregunta es directa: ¿para qué sirve realmente la ética? Y su primera respuesta te va a sorprender: para ahorrar plata.');
+
+S({title:'La cadena de la confianza',
+html:`
+${nd(50,200,250,'Ética','honestidad, veracidad',0,'cor')}
+${nd(355,200,250,'Confianza','',0,'cor')}
+${nd(660,200,260,'Menos controles','contratos, juicios, guardias',1,'cor')}
+${nd(975,200,255,'Más barato','en dinero y en sufrimiento',1,'ok','glow')}
+${svg(`${arr(303,245,348,245,'cor','',0)}${arr(608,245,653,245,'cor','',1)}${arr(923,245,968,245,'cor','',1)}
+${arr(303,465,348,465,'bad','',2)}${arr(608,465,653,465,'bad','',2)}${arr(923,465,968,465,'bad','',2)}`)}
+${nd(50,420,250,'Sin ética','',2,'bad')}
+${nd(355,420,250,'Desconfianza','',2,'bad')}
+${nd(660,420,260,'Todo más caro','',2,'bad')}
+${nd(975,420,255,'Pagan los más débiles','',2,'bad')}
+${P(50,600,'Pregunta 4','cor',0)}`,
+beats:[
+`La tesis de Cortina, que es la pregunta cuatro, funciona como una cadena. La ética, es decir, la honestidad y la veracidad, genera confianza.`,
+`Cuando confiamos unos en otros, no necesitamos tantos controles, contratos, abogados, juicios ni guardias. Y entonces todo sale más barato: en dinero, pero sobre todo en sufrimiento, en vidas destrozadas, en conflictos y rencores.`,
+`Si falta la ética, pasa lo contrario: la desconfianza encarece todo. Y Cortina insiste en algo: ese costo casi siempre lo terminan pagando los más débiles.`]
+});
+
+S({title:'El Tribunal de las Aguas',
+html:`${svg(`
+  ${pth('M80 230 C300 260 380 210 600 250',0,'ln','stroke:var(--sav);stroke-width:7')}
+  <text x="90" y="205" class="lblm" data-b="0">RÍO TURIA</text>
+  ${[120,180,240,300,360,420,480,540].map((x,k)=>pth(`M${x} ${246-((x-80)/520)*0} C${x+10} 330 ${x-30} 420 ${x-10} 560`,{b:0,d:k*.07},'ln2','stroke:var(--sav)')).join('')}
+  <text x="330" y="600" text-anchor="middle" class="lbl" data-b="0">8 acequias</text>
+`)}
+${nd(680,170,530,'Cada jueves, en la Catedral de Valencia','Resuelve los conflictos de los agricultores por el agua.',0,'cor')}
+${nd(680,330,530,'Todo es oral','La sentencia no se escribe. Lo sostiene la <b>palabra dada</b>.',1,'cor')}
+${nd(680,490,530,'Costos mínimos','Es la confianza la que lo hace todo tan barato.',2,'ok','glow')}`,
+beats:[
+`Su primer ejemplo. Todos los jueves al mediodía, en la puerta de la Catedral de Valencia, en España, se reúne el Tribunal de las Aguas. Resuelve los conflictos de los agricultores por el uso del agua de ocho acequias que la sacan del río Turia.`,
+`Todo es oral. La sentencia ni siquiera se escribe. No hay papeleo, porque lo que sostiene todo es un valor en el que todos confían: la palabra dada.`,
+`Por eso los gastos son mínimos. Es la confianza la que lo hace todo tan barato. Imagina si las familias, las escuelas, las empresas y las instituciones funcionaran con esa confianza: la vida sería muchísimo más barata.`]
+});
+
+S({title:'Lo caro de la desconfianza',
+html:`
+${nd(70,175,540,'La Cúpula de Hierro','Escudo antimisiles israelí: unos <b>796 millones de euros</b>, y unos <b>39.000 €</b> por cartucho (cifras de Cortina).',0,'bad')}
+${nd(70,370,540,'Coste de oportunidad','Lo que se gasta ahí deja de ir a hospitales, escuelas o viviendas.',1,'line')}
+${P(70,540,'La población lo acepta como «mal menor»','cor',1,'nc')}
+${N(690,180,520,'Y a esa gota se suman:',2)}
+${P(690,240,'rejas','bad',2)}${P(810,240,'puertas blindadas','bad',2)}${P(690,300,'guardias','bad',2)}${P(830,300,'armas','bad',2)}
+${nd(690,400,520,'¿Para qué sirve la ética?','Para ahorrar gasto y dolor en todo lo que depende de nosotros, e invertirlo en lo que vale la pena.',2,'cor','glow')}`,
+beats:[
+`Ahora el otro lado: lo que cuesta desconfiar. Israel instaló un escudo antimisiles, la Cúpula de Hierro. Según Cortina, costó unos 796 millones de euros, y cada cartucho, unos 39 mil euros.`,
+`Todo lo que se gasta ahí deja de invertirse en hospitales, escuelas o viviendas. Aun así, la población lo acepta porque la protege: le parece, a fin de cuentas, el mal menor. Guarda esa expresión, que la vemos en el capítulo siete.`,
+`Y a esa gota se suman las rejas en las ventanas, las puertas blindadas, los guardias y la venta de armas. Todo eso es el precio de la falta de confianza. La ética sirve para ahorrar ese gasto y ese dolor en todo lo que depende de nosotros, e invertirlo en lo que vale la pena.`]
+});
+
+S({title:'El caso del banco · Aristóbulo de Juan',
+html:`
+${nd(50,165,250,'Banco sano','',0,'ok')}
+${nd(345,165,380,'Errores técnicos','Incompetencia, no adaptarse. <b>Sin problema moral</b>.',1,'line')}
+${nd(770,165,460,'Balance desequilibrado','Deuda y activos riesgosos. <b>Aún tiene remedio</b>.',1,'line')}
+${svg(`${arr(303,205,338,205,'line','',1)}${arr(728,205,763,205,'line','',1)}
+  ${pth('M1000 270 C1000 330 520 320 360 372',2,'ln','stroke:var(--ok)')}
+  ${pth('M1000 270 C1000 320 960 340 950 372',3,'ln','stroke:var(--bad)')}`)}
+${nd(50,380,560,'Camino A · Transparentar','Reconocer, inyectar capital, cambiar a los malos gestores, decirlo al mercado → <b>confianza</b>.',2,'ok','glow')}
+${nd(670,380,560,'Camino B · Maquillar','Ganar tiempo escondiendo cifras → huida hacia delante → fraude → cerrar o rescatar. Ya no es error técnico: es <b>ético</b>.',3,'bad')}
+${P(50,570,'Postura: transparentar duele hoy, pero es más barato que quebrar','cor',4,'nc')}`,
+beats:[
+`El ejemplo más importante del capítulo, y de la pregunta cuatro, lo contó Aristóbulo de Juan, antiguo Gobernador del Banco de España. Es la historia de cómo un banco bueno se vuelve malo sin proponérselo.`,
+`Paso uno: un banco sano empieza a cometer errores técnicos, por incompetencia o por no adaptarse a los cambios. Hasta aquí no hay ningún problema moral: le puede pasar a cualquiera. Paso dos: el balance se desequilibra, se endeuda e invierte en sectores riesgosos. Todavía tiene remedio.`,
+`Camino A: transparentar. Los dueños y la dirección reconocen la situación, inyectan capital, cambian a los malos gestores y le dicen al mercado que están corrigiendo. Quien reconoce sus errores y los corrige abiertamente genera confianza.`,
+`Camino B: maquillar. Para ganar tiempo, se esconden los números, y ni los auditores ni los supervisores lo corrigen. Aquí ya no estamos en un error técnico: entramos en el terreno de la ética. Después viene la huida hacia delante, a veces el fraude, y al final hay que cerrar o rescatar el banco.`,
+`Tu postura para la pregunta cuatro: transparentar duele a corto plazo, porque da vergüenza y asusta al mercado. Pero es muchísimo más barato que una quiebra. Cortina agrega otras fallas de la crisis: asesores que se movían por incentivos y no por su profesión, y el cortoplacismo, pensar solo en el corto plazo.`]
+});
+
+/* ===================== 6. PROFESIONALES ===================== */
+CH('Profesionales, no solo técnicos','Cortina','Capítulo seis: Cortina otra vez, ahora sobre las profesiones. Aquí están las preguntas dos y tres, y es lo que más te toca como futuro ingeniero.');
+
+S({title:'Técnicas y prácticas (Aristóteles)',
+html:`
+${nd(70,175,540,'Técnica','Se hace <b>por otra cosa</b>: un resultado. Ej.: hacer zapatos (importan los zapatos).',0,'cor')}
+${nd(70,360,540,'Quien domina una técnica…','No discute si el fin es bueno o malo: busca el mejor <b>medio</b>.',1,'line')}
+${nd(670,175,540,'Práctica','Se hace <b>por sí misma</b>: tiene un bien dentro. Ej.: pasear (importa el paseo).',2,'cor')}`,
+beats:[
+`Cortina usa una distinción de Aristóteles entre dos tipos de acciones. Las técnicas son acciones que hacemos por otra cosa, para obtener un resultado. Como hacer zapatos: lo que importa son los zapatos, no la actividad.`,
+`Quien domina una técnica no discute si el fin es bueno o malo: solo busca el mejor medio para llegar a él.`,
+`Las prácticas, en cambio, son actividades que hacemos por sí mismas, porque tienen un bien dentro. Como pasear: no paseas para llegar a algún lado, paseas por el gusto de pasear.`]
+});
+
+S({title:'El veneno: el fin lo cambia todo',
+html:`${svg(`
+  <g data-b="0" style="color:var(--cor)"><path d="M300 200 L300 290 L220 470 Q210 500 240 500 L420 500 Q450 500 440 470 L360 290 L360 200 Z" class="ic"/><line x1="285" y1="200" x2="375" y2="200" class="ic"/><path d="M250 420 L410 420" class="ic" style="opacity:.6"/></g>
+  ${arr(450,380,620,300,'bad','',1)}${arr(450,420,620,500,'ok','',1)}
+  <text x="660" y="300" class="lblb" data-b="1" style="fill:var(--bad)">matar</text>
+  <text x="660" y="508" class="lblb" data-b="1" style="fill:var(--ok)">sanar</text>
+  <text x="330" y="560" text-anchor="middle" class="lbl" data-b="1">misma técnica, fin opuesto</text>
+`)}
+${QT(800,200,420,'Formar solo en técnicas sería un error craso.','Cortina',1,'cor',30)}
+${nd(800,400,420,'Pregunta 3','Técnico = domina medios. Profesional = los pone al servicio de buenos fines y responde por las consecuencias.',2,'cor')}`,
+beats:[
+`¿Por qué importa? Porque las técnicas valen según el fin que se persigue con ellas. Cortina da un ejemplo fuerte: es igual de competente técnicamente quien maneja bien un veneno para matar que quien lo maneja bien para sanar.`,
+`La diferencia no está en la técnica, sino en el fin: matar o sanar. Y es una diferencia radical. Por eso dice que sería un error craso formar solo en técnicas, que sirven para cualquier fin, y no ayudar a distinguir cuáles fines valen la pena.`,
+`Esta es la pregunta tres. Un buen técnico domina los procedimientos. Un buen profesional, además, los pone al servicio de buenos fines y se hace responsable de los medios y de las consecuencias. Tu postura: la técnica te dice cómo hacer algo, pero no si se debe hacer.`]
+});
+
+S({title:'El bien interno de cada profesión',
+html:`
+${N(70,165,1140,'Profesión: actividad social cooperativa que busca un <b>bien interno</b> que ninguna otra da. Por eso la sociedad la acepta como legítima.',0)}
+${nd(70,280,540,'Medicina','El bien del paciente: prevenir, cuidar, curar, ayudar a morir en paz.',1,'cor')}
+${nd(670,280,540,'Docencia','Transmitir cultura y formar personas críticas y autónomas.',1,'cor')}
+${nd(70,440,540,'Derecho','Una convivencia más justa.',1,'cor')}
+${nd(670,440,540,'Ingeniería','La seguridad de las personas, la salud y el bienestar público, el medio ambiente.',2,'cod','glow')}`,
+beats:[
+`Ahora, ¿qué es una profesión para Cortina? Es una actividad social, que hacen muchas personas en cooperación, y que busca un bien interno que ninguna otra actividad puede dar. Por eso la sociedad la acepta como legítima.`,
+`La medicina busca el bien del paciente: prevenir, cuidar, curar y ayudar a morir en paz. La docencia busca transmitir cultura y formar personas críticas y autónomas. El derecho busca una convivencia más justa.`,
+`¿Y la ingeniería? El Código del Colegio de Ingenieros lo dice: cuidar la seguridad de las personas, la salud y el bienestar público, y el medio ambiente. Esa es la meta que tú asumirías al titularte.`]
+});
+
+S({title:'Motivos y razones',
+html:`
+${N(70,170,500,'Motivos para entrar (legítimos):',0)}
+${P(70,230,'sueldo','line',0)}${P(200,230,'enriquecerse','line',0)}${P(70,290,'prestigio','line',0)}${P(230,290,'identidad social','line',0)}
+${svg(arr(480,270,640,270,'cor','',1))}
+${nd(670,190,540,'…pero hay que asumir la meta','Los motivos solo se vuelven <b>razones</b> cuando coinciden con la meta de la profesión.',1,'cor','glow')}
+${nd(70,400,540,'Si los motivos desplazan a las razones','La profesión se corrompe y pierde su legitimidad.',2,'bad')}
+${nd(670,400,540,'Ejemplo','Un ingeniero que ahorra en materiales para ganar más, y el puente se cae.',2,'line')}
+${P(70,590,'Pregunta 2 · postura: de acuerdo, la sociedad confía por esa meta','cor',2,'nc')}`,
+beats:[
+`Pregunta dos. Cortina dice que se puede entrar a una profesión por motivos muy distintos: ganar un sueldo para vivir, enriquecerse, tener una identidad social, conseguir prestigio. Todo eso es legítimo.`,
+`Pero sea cual sea tu motivo, al entrar debes asumir también la meta que le da sentido a la profesión. Un médico no puede justificar su negligencia diciendo: yo entré a esto por la plata. Los motivos solo se convierten en razones cuando coinciden con las metas de la profesión.`,
+`Cuando los motivos desplazan a las razones, la profesión se corrompe: deja de dar el bien que solo ella da, y pierde su legitimidad. Ejemplo de ingeniería: un ingeniero que, para ganar más, ahorra en materiales, y el puente se cae. Tu postura: de acuerdo con Cortina, porque la sociedad confía en los profesionales justamente por esa meta.`]
+});
+
+S({title:'Ajedrez, caramelos y asesores',
+html:`${svg(`<g data-b="0">${[0,1,2,3].map(i=>[0,1,2,3].map(k=>`<rect x="${90+k*45}" y="${180+i*45}" width="45" height="45" style="fill:${(i+k)%2?'#2a2932':'#15151c'};stroke:var(--line2)"/>`).join('')).join('')}</g>
+  <g data-b="0" style="color:var(--cor)"><circle cx="330" cy="270" r="26" class="ic"/><path d="M304 270 l-22 -14 v28 z M356 270 l22 -14 v28 z" class="ic"/></g>`)}
+${N(70,380,420,'El caramelo sirve para empezar; si el juego nunca le gusta, <b>hará trampas</b> cuando pueda.',0)}
+${nd(560,170,650,'El asesor bancario','Si su sueldo depende de venderte ciertos fondos, te dirá que el riesgo es asumible. Técnico competente, <b>no buen profesional</b>.',1,'bad')}
+${TB(560,420,650,['Ethos burocrático','Ethos profesional'],[['Cumple el mínimo legal para que no lo acusen','Busca la <b>excelencia</b> (areté): se compromete con personas de carne y hueso']],{h:2,r:[2]},20)}`,
+beats:[
+`Cortina cita un ejemplo de MacIntyre. Unos padres quieren que su hijo aprenda ajedrez, pero no le gusta, así que le prometen un caramelo cada vez que juegue. El caramelo puede servir para que empiece. Pero si con el tiempo el juego no le gusta por sí mismo, hará trampas cuando pueda.`,
+`Lo mismo con los profesionales que se mueven por incentivos ajenos a su meta. Un asesor de banco cuyo sueldo depende de que compres ciertos fondos te dirá que el riesgo es asumible. Puede ser un técnico muy competente, pero no es buen profesional, porque no te advierte los riesgos ni piensa en tu interés.`,
+`Cortina recuerda que quienes desencadenaron la crisis económica eran graduados de MBA de universidades de excelencia: técnicos brillantes, no profesionales auténticos. Por eso distingue dos actitudes. El ethos burocrático cumple el mínimo legal para que no lo acusen. El ethos profesional busca la excelencia, porque se compromete con personas de carne y hueso.`]
+});
+
+/* ===================== 7. MAL MENOR Y PATERNALISMO ===================== */
+CH('Mal menor y paternalismo','Cortina','Capítulo siete: dos conceptos que el cuestionario pregunta por separado, en las preguntas cinco y once. Los dos tienen que ver con decidir cuando no hay una opción perfecta.');
+
+S({title:'El mal menor',
+html:`${svg(scaleArt(330,230,'opción mala','opción peor',0,'cor','bad'))}
+${nd(700,165,520,'Democracia de mayorías','No porque la mayoría siempre acierte, sino porque no hemos hallado un mecanismo mejor.',1,'cor')}
+${nd(700,330,520,'Ejemplo de ingeniería','Cortar el agua unas horas para reparar antes de que reviente la matriz.',2,'line')}
+${nd(700,480,520,'¿Cuándo se justifica?','1. No hay opción buena · 2. El daño es el mínimo · 3. No se vuelve excusa permanente.',3,'cor','glow')}`,
+on(j,r,m){animv(r,'ang',-11,1.4,v=>setScale(r,330,230,v),m)},
+beats:[
+`El mal menor es elegir una opción que tiene costos, porque todas las alternativas son peores. No es elegir algo bueno: es elegir lo menos malo.`,
+`En Cortina aparece dos veces. Una, el gasto en defensa, como la Cúpula de Hierro. Otra, la democracia: aceptamos que decida la mayoría no porque la mayoría siempre tenga razón, sino porque no hemos encontrado un mecanismo mejor. Por eso lo que importa es cómo se forman esas mayorías: con debate y respetando a las minorías.`,
+`Un ejemplo de ingeniería: cortar el agua a un sector durante unas horas para reparar una cañería antes de que reviente la matriz principal y deje sin agua a toda la ciudad.`,
+`¿Hasta qué punto se justifica? Tu postura puede tener tres condiciones: que de verdad no haya una opción buena, que el daño sea el mínimo posible, y que no se vuelva una excusa permanente. Cortina agrega que la vida está hecha más de problemas que de dilemas: muchas veces, con creatividad, hay una salida que evita la elección cruel.`]
+});
+
+S({title:'El paternalismo',
+html:`
+${N(70,165,1140,'Decidir por otra persona <b>«por su bien»</b>, sin su consentimiento, como un padre con un niño pequeño.',0)}
+${nd(70,250,540,'Estado paternalista','«Te haré feliz»: trata a los ciudadanos como incapaces. Es el programa de las dictaduras.',1,'bad')}
+${nd(670,250,540,'Estado justo','Pone las bases de justicia para que cada uno lleve su propio plan de vida.',2,'ok')}
+${TB(70,450,1140,['Caso','Juicio'],[['Casco en la obra, cinturón en el auto','Razonable: daño grave e irreversible, intervención mínima'],['Que el Estado elija qué libros lees','Injustificado: invade la autonomía']],{h:3,r:[3,3]},20)}`,
+beats:[
+`El paternalismo es decidir por otra persona por su bien, sin su consentimiento, como un padre decide por un niño pequeño.`,
+`Cortina lo critica cuando un Estado promete hacer felices a sus ciudadanos. Eso, dice, es el programa de las dictaduras y los totalitarismos: tratar a la gente como incompetente para saber qué la hace feliz. Y curiosamente, lo que le conviene a la gente suele coincidir con lo que le conviene al gobierno.`,
+`Para ella, el deber del Estado no es hacernos felices, sino ser justo: poner las bases para que cada persona pueda llevar adelante el plan de vida que valore, sin impedir que otros hagan lo mismo.`,
+`La pregunta once te pide al menos dos conceptos. Puedes usar la autonomía de Kant, la libertad de Savater y el mal menor. Ejemplo razonable: obligar a usar casco en una obra o cinturón en el auto, porque el daño evitado es grave e irreversible y la intervención es mínima. Ejemplo injustificado: que el Estado decida qué libros puedes leer para que seas feliz.`]
+});
+
+/* ===================== 8. KANT ===================== */
+CH('Mayoría de edad','Kant','Capítulo ocho: Kant y la mayoría de edad. Es la pregunta diez, y conecta con todo lo que dijo Savater sobre pensar por uno mismo.');
+
+S({title:'Minoría y mayoría de edad',
+html:`
+${BIG(70,170,'<span style="font-family:var(--f-math);font-style:italic;font-weight:600">Sapere aude</span>',2,'kan',84)}
+${N(76,275,700,'«¡Atrévete a usar tu propio entendimiento!»',2)}
+${nd(70,360,540,'Minoría de edad','No usar tu entendimiento sin que otro te guíe. Muchas veces por <b>pereza</b> o <b>cobardía</b>.',0,'line')}
+${nd(670,360,540,'Mayoría de edad','Autonomía: darte a ti mismo tus propias leyes; no ser súbdito de otros.',2,'kan','glow')}
+${N(70,560,1140,'No es la edad del carnet. Conecta con Savater: hacerse adulto es <b>inventar</b> tu propia vida.',3)}`,
+beats:[
+`En un texto de 1784 llamado ¿Qué es la Ilustración?, Kant distingue dos estados. La minoría de edad es no ser capaz de usar tu propio entendimiento sin que otro te guíe.`,
+`Y lo interesante: Kant dice que muchas veces es culpa nuestra, porque no nos falta inteligencia, sino valor. Por pereza o por cobardía, es más cómodo que otro piense por nosotros: un libro, un jefe, un experto.`,
+`La mayoría de edad es la autonomía: la capacidad de darse a uno mismo sus propias leyes, de no ser súbdito de otros. Su lema es Sapere aude: atrévete a usar tu propio entendimiento.`,
+`Ojo, no tiene que ver con la edad del carnet. Un adulto de cuarenta años que solo obedece está en minoría de edad. Y conecta con Savater: hacerse adulto es poder inventar tu propia vida, en vez de vivir la que otros inventaron.`]
+});
+
+S({title:'El potencial creativo de la ética',
+html:`
+${nd(70,250,330,'Problema nuevo','IA, privacidad de datos: ninguna norma lo prevé.',0,'line')}
+${svg(`${pth('M405 300 C480 300 500 210 560 210',1,'ln','stroke:var(--bad)')}${pth('M405 300 C480 300 500 420 560 420',1,'ln','stroke:var(--kan)')}`)}
+${nd(570,165,640,'Solo obedezco normas','No hay orden ni costumbre que seguir → me quedo sin respuesta.',1,'bad')}
+${nd(570,370,640,'Pienso por mí mismo','Creo una solución. Savater: cuando la cosa es seria, hay que inventar.',1,'kan','glow')}
+${nd(70,540,1140,'Ejemplo y evaluación','Un ingeniero telemático diseña una política de privacidad que la ley aún no exige. La autonomía hace viva a la ética, pero exige <b>dar razones</b>: crear no es hacer un capricho.',2,'acc')}`,
+beats:[
+`¿Qué tiene que ver esto con el potencial creativo de la ética? Piensa en un problema nuevo, que ninguna norma prevé, como el uso de inteligencia artificial o la privacidad de los datos en una aplicación.`,
+`Si solo sé obedecer normas, frente a eso me quedo sin respuesta: no hay una orden ni una costumbre que seguir. Quien es autónomo, en cambio, puede crear una solución. Savater lo dijo con el capitán: cuando las cosas se ponen serias, hay que inventar.`,
+`Ejemplo: un ingeniero telemático que diseña una política de privacidad para su aplicación, aunque la ley todavía no lo exija. Tu evaluación: la autonomía es lo que hace viva a la ética, pero exige dar razones. Crear no es lo mismo que hacer un capricho.`]
+});
+
+/* ===================== 9. COMTE-SPONVILLE ===================== */
+CH('La moral','Comte-Sponville','Capítulo nueve: André Comte-Sponville y el capítulo La moral. Es corto, pero tiene una de las imágenes más famosas de la filosofía: un anillo que te vuelve invisible.');
+
+S({title:'La moral no es castigar',
+html:`
+${N(70,175,560,'Para castigar ya están:',0)}
+${N(70,225,560,'<span class="strike" data-st="1">tribunales · policía · cárceles</span>',0)}
+${nd(70,320,540,'La moral empieza donde no hay castigo','Cuando somos libres. Sócrates muere preso y es más libre que sus jueces.',1,'cs')}
+${nd(670,175,540,'No robo porque hay un guardia','Eso no es honestidad: es <b>cálculo</b>. No es moral: es <b>precaución</b>.',2,'line')}`,
+on:ST,
+beats:[
+`Comte-Sponville parte corrigiendo una idea equivocada. La función de la moral no es castigar, reprimir ni condenar. Para eso están los tribunales, la policía y las cárceles, y nadie diría que eso es la moral.`,
+`La moral empieza justo donde ningún castigo es posible: cuando somos libres. Sócrates murió en la cárcel, y aun así era más libre que sus jueces.`,
+`Un ejemplo. Te encantaría robar un disco en una tienda, pero no lo haces porque hay un guardia o una alarma. Eso no es honestidad: es cálculo. No es moral: es precaución.`]
+});
+
+S({title:'El anillo de Giges',
+html:`${svg(`
+  <g data-b="0" style="color:var(--cs)"><circle cx="260" cy="330" r="80" class="ic" style="stroke-width:10"/><path d="M230 240 L260 205 L290 240 Z" class="icf"/></g>
+  ${person(260,620,1.3,'cs',0,'gp')}
+  <text x="260" y="672" text-anchor="middle" class="lbl" data-b="0">Platón, La República</text>
+`)}
+${nd(520,165,690,'La historia','Un pastor encuentra un anillo que lo vuelve invisible. Giges entra al palacio, seduce a la reina, mata al rey y toma el poder.',1,'line')}
+${nd(520,335,690,'¿Qué harías tú?','Lo que te permitirías siendo invisible habla de tu prudencia o hipocresía. Lo que seguirías <b>prohibiéndote por deber</b>: eso es moral.',2,'cs')}
+${nd(520,505,690,'Tu moral','Las reglas que respetarías incluso si fueras invisible e invencible.',3,'cs','glow')}`,
+loop(st,r,j){const g=r.querySelector('#gp');if(g)g.style.opacity=String(.12+.88*(.5+.5*Math.cos(st*1.5)))},
+beats:[
+`Ahora imagina que tienes el anillo de Giges, del que habla Platón en La República. Un pastor lo encuentra por casualidad: si giras la piedra hacia la palma de tu mano, te vuelves invisible.`,
+`Giges, que pasaba por ser un hombre honesto, no resistió: entró al palacio, sedujo a la reina, mató al rey y se quedó con el poder. En el diálogo se sugiere que el bueno y el malo solo se distinguen por el miedo a ser vistos.`,
+`Comte-Sponville te pregunta a ti: ¿qué harías con ese anillo? Lo que te permitirías siendo invisible habla de tu prudencia o de tu hipocresía. Lo que seguirías prohibiéndote, no por interés sino por deber, solo eso es propiamente moral.`,
+`Por eso define tu moral como el conjunto de reglas que respetarías incluso si fueras invisible e invencible. Tú vales exactamente el bien que haces y el mal que te prohíbes, aunque nadie lo sepa jamás.`]
+});
+
+S({title:'La moral es en primera persona',
+html:`
+${BIG(70,180,'¿Qué debo hacer <span style="color:var(--cs)">yo</span>?',0,'ink',60)}
+${BIG(70,300,'<span class="strike" data-st="1">¿Qué deben hacer los demás?</span>',0,'dim',48)}
+${nd(70,400,540,'Moralista','Vive pendiente de los deberes del vecino. Decir «sé generoso» no es ser generoso.',1,'bad')}
+${QT(670,410,540,'«La moral no es nunca para el vecino»','Alain',1,'cs',30)}
+${N(70,580,1140,'Moralmente, solo te juzga tu <b>conciencia</b>. Estar en regla con la sociedad no te exime de estar en regla contigo.',2)}`,
+on:ST,
+beats:[
+`Segunda idea: la moral es en primera persona. Responde a la pregunta «¿qué debo hacer yo?», y no a «¿qué deben hacer los demás?».`,
+`Quien vive pendiente de los deberes del vecino no es moral: es moralista. Como decía el filósofo Alain, la moral no es nunca para el vecino. Decirle a alguien «sé generoso» no es ser generoso.`,
+`Moralmente, solo te puede juzgar tu propia conciencia. Puedes estar en regla con la sociedad, y hay que estarlo, pero eso no te exime de estar en regla contigo mismo.`]
+});
+
+S({title:'¿Y si todos lo hicieran?',
+html:`${svg(`${Array.from({length:18},(_,k)=>person(110+(k%6)*85,300+Math.floor(k/6)*105,.55,'cs',{b:0,d:k*.04})).join('')}`)}
+${nd(640,165,570,'Si todos mintieran','Nadie creería a nadie; ni siquiera se podría mentir.',1,'cs')}
+${nd(640,295,570,'Si todos robaran','No habría propiedad ni nada que robar.',1,'cs')}
+${nd(640,425,570,'Kant: imperativo categórico','Actúa solo según una regla que puedas querer como ley para todos.',2,'kan')}
+${N(70,600,1140,'Contra la crueldad, más que un argumento, hace falta <b>valor</b>.',3)}`,
+beats:[
+`¿Entonces hay tantas morales como personas? No. Esa es la paradoja: la moral vale en primera persona, pero para todos. Y hay una prueba muy simple: preguntarte qué pasaría si todos hicieran lo mismo que tú.`,
+`Si todos mintieran, nadie creería a nadie, y ni siquiera se podría mentir, porque la mentira necesita que alguien confíe. Si todos robaran, no habría propiedad ni nada que robar. Es lo que le dicen los papás al niño que bota el chicle en la vereda: imagina que todos lo hicieran.`,
+`Esa es la idea del imperativo categórico de Kant: actúa solo según una regla que puedas querer que se vuelva ley para todos. Y su versión más conocida: trata a los demás como quieres que te traten.`,
+`¿Y hace falta demostrarlo todo primero? No. Si un niño se ahoga, no necesitas un fundamento filosófico para salvarlo. Frente a la crueldad, lo que más se necesita no es un argumento, sino valor.`]
+});
+
+S({title:'Virtud o consecuencias · pregunta 12',
+html:`
+${nd(70,170,540,'Por deber, sin esperar nada','La virtud recae en uno mismo: la intención y el deber. Kant: bueno es lo que se hace «sin esperar nada de ella».',1,'cs','glow')}
+${nd(670,170,540,'Por el premio o el castigo','El creyente que obra solo por el cielo o por miedo al infierno: egoísta y prudente, no virtuoso.',0,'bad')}
+${nd(70,420,1140,'Postura sugerida','La intención define la virtud, pero un ingeniero no puede desentenderse de las consecuencias de su obra: actuar por deber y responsabilizarse de los resultados (ética de la responsabilidad, Cortina).',2,'acc')}
+${N(70,610,1140,'La moral no reemplaza a la felicidad ni al amor… pero ninguno de los dos te exime de ella.',3)}`,
+beats:[
+`Llegamos a la pregunta doce. Comte-Sponville dice que el creyente que respeta la moral solo por ganarse el cielo, o por miedo al infierno, no es virtuoso: es egoísta y prudente.`,
+`Siguiendo a Kant, una acción solo es moralmente buena si se hace sin esperar nada de ella. Por eso la virtud está en uno mismo, en la intención y el deber, y no en las consecuencias que vas a obtener, como un premio o evitar un castigo. Aunque Dios no existiera, igual tendrías que actuar humanamente.`,
+`Para tu postura, una idea que funciona bien: la intención es lo que define la virtud, pero un ingeniero no puede desentenderse de las consecuencias de su obra. La síntesis es actuar por deber y, además, responsabilizarse de los resultados, que es la ética de la responsabilidad de Cortina.`,
+`Un último detalle del autor: la moral no reemplaza a la felicidad ni al amor, por eso no lo es todo. Pero ninguna felicidad ni ningún amor te eximen de ella.`]
+});
+
+/* ===================== 10. CÓDIGO ===================== */
+CH('El Código de Ética','Colegio de Ingenieros de Chile','Capítulo diez: el Código de Ética del Colegio de Ingenieros de Chile. Es el ejemplo concreto de la meta de una profesión, escrita como normas.');
+
+S({title:'Qué es el Código',
+html:`
+${nd(70,175,540,'Normas obligatorias','Para los ingenieros colegiados: regulan su conducta en el ejercicio de la profesión.',0,'cod')}
+${nd(670,175,540,'Nadie puede alegar ignorancia','Si alguien las infringe, el Tribunal de Ética investiga y puede sancionar.',1,'cod')}
+${nd(70,400,1140,'No reemplaza la responsabilidad personal','Es un referente para analizar cada situación. No basta obedecerlo como una orden: hay que pensarlo.',2,'acc','glow')}`,
+beats:[
+`El Código es un conjunto de normas obligatorias para los ingenieros que pertenecen al Colegio. Regula su conducta en el ejercicio de la profesión.`,
+`Sus normas se presumen conocidas: nadie puede alegar que no las sabía. Si alguien las infringe, el Tribunal de Ética del Colegio investiga y puede sancionar.`,
+`Y algo importante: el propio Código dice que es un referente para analizar cada situación, pero que no reemplaza la responsabilidad personal de cada ingeniero. Es decir, no basta con obedecerlo como una orden: hay que pensarlo.`]
+});
+
+S({title:'Principios y con qué autor conectan',
+html:`${TB(60,160,1160,['Principio','Qué exige','Conecta con'],[
+ ['Seguridad','Cuidar la vida, la salud pública y el medio ambiente','La meta de la profesión · Cortina'],
+ ['Competencia','Trabajar solo donde estás calificado','Libre no es omnipotente · Savater'],
+ ['Veracidad','Informes objetivos; avisar los riesgos','Transparentar, no maquillar · el banco'],
+ ['Independencia','Criterio propio; rechazar encargos que violen el Código','Voluntad vs. órdenes · Savater; Kant'],
+ ['Conflicto de intereses','Evitarlo o declararlo; no aceptar pagos que comprometan el juicio','Motivos vs. razones · Cortina'],
+ ['Anticorrupción','No tolerar soborno, fraude ni colusión','Buen profesional, no solo técnico']],{h:0,r:[0,1,1,2,3,3]},20)}`,
+beats:[
+`Estos son los principios que más te sirven para el certamen, y con qué autor conectan. Primero, seguridad: cuidar la vida de las personas, la salud pública y el medio ambiente. Es la meta de la profesión de Cortina.`,
+`Segundo, competencia: trabajar solo en áreas donde estás calificado. Conecta con Savater: libertad no es omnipotencia. Tercero, veracidad: informes objetivos y veraces, e informar los riesgos. Es transparentar en vez de maquillar, como en el caso del banco.`,
+`Cuarto, independencia: mantener tu criterio sin que las presiones sirvan de excusa. El Código dice que quien trabaja bajo un superior debe rechazar encargos que violen el Código. Eso es voluntad contra órdenes: cumplí órdenes no justifica nada.`,
+`Quinto, evitar conflictos de interés y no aceptar pagos que comprometan tu juicio: motivos contra razones. Y sexto, no tolerar soborno, fraude ni colusión. Úsalo así en una respuesta: si tu jefe te pide firmar un informe que oculta una falla, por orden lo firmarías; por voluntad no, porque el Código te exige veracidad y rechazar ese encargo.`]
+});
+
+/* ===================== 11. CÓMO RESPONDER ===================== */
+CH('Cómo responder','Repaso final','Último capítulo: cómo responder en el certamen, y un repaso rápido de las doce preguntas.');
+
+S({title:'La receta de tres pasos',
+html:`
+${LI(80,190,1,'<b>Explica</b> el concepto con tus palabras y di de qué autor viene.',1)}
+${LI(80,290,2,'<b>Da un ejemplo</b> concreto; si es de ingeniería, mejor.',1)}
+${LI(80,390,3,'<b>Toma postura</b> y justifícala, como con Toulmin:',2)}
+${nd(140,490,230,'Tesis','',2,'acc')}${nd(420,490,230,'Razón','',2,'acc')}${nd(700,490,230,'Objeción','',2,'line')}${nd(980,490,230,'Respuesta','',2,'acc')}
+${svg(`${arr(372,520,413,520,'acc','',2)}${arr(652,520,693,520,'line','',2)}${arr(932,520,973,520,'acc','',2)}`)}`,
+beats:[
+`Casi todas las preguntas del cuestionario piden lo mismo: explicar, ejemplificar y tomar postura. Así que usa siempre esta receta de tres pasos.`,
+`Paso uno: explica el concepto con tus palabras y di de qué autor viene. Paso dos: da un ejemplo concreto; si es de ingeniería, mucho mejor, porque muestra que lo sabes aplicar.`,
+`Paso tres: toma postura y justifícala, como aprendiste con Toulmin en el certamen uno. Di tu tesis, la razón que la apoya, una posible objeción, y por qué esa objeción no te convence. Una postura sin razones no vale.`]
+});
+
+const RQ=(n,t,s,b,y)=>LI(80,y,n,`<b>${t}</b> — ${s}`,b,1120);
+S({title:'Repaso: preguntas 1 a 6',
+html:`
+${RQ(1,'Ética y moral','normas vs. reflexión · no copiar · nos hace autónomos',0,170)}
+${RQ(2,'Motivos y meta','asumir el bien interno · el puente · de acuerdo con Cortina',1,250)}
+${RQ(3,'Técnico y profesional','medios vs. fines · el veneno, los asesores · error craso',2,330)}
+${RQ(4,'Abarata costos','confianza · el banco · transparentar es más barato',3,410)}
+${RQ(5,'Mal menor','lo menos malo · cortar el agua · tres condiciones',4,490)}
+${RQ(6,'Libres pese a factores','condicionan, no determinan · Héctor · responsabilidad',5,570)}`,
+beats:[
+`Pregunta uno: ética y moral. Moral son las normas aceptadas; ética, la reflexión sobre por qué valen. Ejemplo: no copiar. Postura: la ética nos hace autónomos.`,
+`Pregunta dos: motivos y meta. Puedes entrar por plata o prestigio, pero debes asumir la meta de la profesión. Ejemplo: el puente que se cae por ahorrar. Postura: de acuerdo, la sociedad confía por esa meta.`,
+`Pregunta tres: técnico y profesional. El técnico domina medios; el profesional los usa para buenos fines y responde por las consecuencias. Ejemplo: los asesores de la crisis, o el veneno. Postura: formar solo en técnicas es un error craso.`,
+`Pregunta cuatro: la ética abarata costos. Ética, confianza, menos controles, menos gasto y menos dolor. Caso del banco: transparentar o maquillar. Postura: transparentar es más barato que quebrar.`,
+`Pregunta cinco: el mal menor. Elegir lo menos malo, como la democracia de mayorías. Ejemplo: cortar el agua unas horas. Postura: vale si no hay alternativa, el daño es mínimo y no se vuelve excusa.`,
+`Pregunta seis: libres pese a los factores. Condicionan, pero no determinan: termitas y Héctor. Ejemplo: dos hermanos que deciden distinto. Postura: si nada dependiera de nosotros, no habría responsabilidad.`]
+});
+
+S({title:'Repaso: preguntas 7 a 12',
+html:`
+${RQ(7,'Libre y omnipotente','dentro de lo posible · el Everest · tengo límites',0,170)}
+${RQ(8,'Voluntad','pensar dos veces · el casco · ninguna acción es buena solo por eso',1,250)}
+${RQ(9,'Haz lo que quieras','Theleme · Esaú · querer de verdad y contar con otros',2,330)}
+${RQ(10,'Mayoría de edad','Sapere aude · política de privacidad · dar razones',3,410)}
+${RQ(11,'Paternalismo','«por su bien» · cinturón vs. censura · solo si el daño es grave',4,490)}
+${RQ(12,'Virtud y consecuencias','sin esperar nada · Giges · deber + resultados',5,570)}`,
+beats:[
+`Pregunta siete: libre y omnipotente. Libertad es elegir dentro de lo posible; omnipotencia, lograr siempre lo que quieres. Ejemplo: el Everest. Postura: evita creer que no somos libres o que no tenemos límites.`,
+`Pregunta ocho: voluntad. Orden, costumbre y capricho vienen de afuera o de la pura gana; voluntad es pensar dos veces y decidir razonando. Ejemplo: el casco. Postura: ninguna acción es buena solo por ser orden, costumbre o capricho.`,
+`Pregunta nueve: haz lo que quieras. Lema de la abadía de Theleme; significa decide tú. Ejemplo: Esaú y las lentejas. Postura: es posible, si distingues lo que quieres de verdad de lo que te apetece, y cuentas con los demás.`,
+`Pregunta diez: mayoría de edad. Atreverse a pensar por uno mismo: Sapere aude. Potencial creativo: crear soluciones donde no hay norma. Ejemplo: la política de privacidad. Postura: la autonomía exige dar razones.`,
+`Pregunta once: paternalismo. Decidir por otros por su bien; Cortina critica al Estado que promete felicidad. Conceptos: autonomía y mal menor. Ejemplo: cinturón obligatorio contra censura de libros. Postura: solo si el daño es grave e irreversible y la intervención es mínima.`,
+`Pregunta doce: virtud y consecuencias. Lo moral es lo que harías aunque fueras invisible, sin esperar nada a cambio. Ejemplo: el anillo de Giges. Postura: la intención define la virtud, pero en ingeniería también respondes por los resultados.`]
+});
+
+S({noHdr:true,title:'Cierre',
+html:`
+<div class="hk" style="left:90px;top:200px" data-b="0">Certamen II · semana del 26 de octubre</div>
+<div class="hero" style="left:84px;top:236px" data-b="0" data-d=".15">¡Éxito!</div>
+${N(90,410,760,'Savater · Cortina · Kant · Comte-Sponville · Código CIICH',0)}
+${nd(90,500,760,'Antes del certamen','Responde en voz alta 3 o 4 preguntas con la receta, sin mirar. Si te trabas, vuelve a su capítulo.',1,'acc')}`,
+beats:[
+`Eso es todo. Si llegaste hasta aquí, ya repasaste la Unidad 2 completa: Savater, Cortina, Kant, Comte-Sponville y el Código de los ingenieros.`,
+`Un último consejo: antes del certamen, intenta responder en voz alta tres o cuatro preguntas del cuestionario con la receta, sin mirar. Si te trabas en una, vuelve a su capítulo. Mucho éxito.`]
+});
+
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const stage=$('#stage'),frame=$('#frame'),player=$('#player'),bar=$('#bar'),fill=bar.querySelector('.fill'),knob=bar.querySelector('.knob'),tip=$('#tip');
+const big=$('#big'),bPlay=$('#bPlay'),icPlay=$('#icPlay'),bVoice=$('#bVoice'),bSpeed=$('#bSpeed'),bFs=$('#bFs'),ctl=$('#ctl'),cap=$('#cap');
+const KEY='hrw133-c2-pos-v1';
+let BE=[],TOTAL=0,g=0,t=0,playing=false,speed=1,voice=false,vDone=true,cur=null,curRoot=null,started=false,dragging=false,vTimer=null,sayTok=null,lastSave=0;
+const SPEEDS=[.75,1,1.25,1.5,2];
+
+/* timeline */
+SC.forEach(s=>{s.start=TOTAL;s.beats.forEach((txt,j)=>{const w=txt.split(/\s+/).length;const d=Math.max(4.5,w*.37+1.6);BE.push({s:s.i,j,txt,d,st:TOTAL});TOTAL+=d});s.end=TOTAL});
+CHS.forEach(c=>c.start=c.scenes[0].start);
+const fmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?`${h}:${String(m).padStart(2,'0')}:${x}`:`${m}:${x}`};
+$('#dur').textContent=`${CHS.length-1} capítulos · ${BE.length} pasos · ${fmt(TOTAL)}`;
+CHS.forEach(c=>{if(c.start>0){const k=document.createElement('div');k.className='tick';k.style.left=(c.start/TOTAL*100)+'%';bar.appendChild(k)}});
+const chBox=$('#chs');
+CHS.forEach(c=>{const b=document.createElement('button');b.innerHTML=`<span class="n">${String(c.i).padStart(2,'0')}<br>${fmt(c.start)}</span><span><span class="t">${c.title}</span><span class="s">${c.sub}</span></span>`;b.onclick=()=>{go(idxAt(c.start+.01),0);if(!started)play();player.scrollIntoView({behavior:'smooth',block:'start'})};c.btn=b;chBox.appendChild(b)});
+function idxAt(T){let lo=0,hi=BE.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(BE[m].st<=T)lo=m;else hi=m-1}return lo}
+
+/* scenes */
+function hdr(sc){return `<div class="hdr"><div class="tag">${sc.ch.sub} · ${sc.ch.title}</div><h2>${sc.title}</h2></div>`}
+function card(c){return `<div class="card"><div class="cnum" data-b="0">${String(c.i).padStart(2,'0')}</div><div class="csub" data-b="0" data-d=".15">${c.sub}</div><div class="cttl" data-b="0" data-d=".3" style="font-size:${c.title.length>22?62:82}px">${c.title}</div>${svg(ln(146,520,1140,520,{b:0,d:.4},'ln','stroke:var(--acc);stroke-width:2'))}</div>`}
+function mount(sc){
+  const old=curRoot;if(old){old.classList.add('out');setTimeout(()=>old.remove(),1100)}
+  const r=document.createElement('div');r.className='scene pre';
+  r.innerHTML=sc.card?card(sc.ch):((sc.noHdr?'':hdr(sc))+sc.html);
+  stage.appendChild(r);r._j=-1;cur=sc;curRoot=r;r.getBoundingClientRect();
+  requestAnimationFrame(()=>r.classList.remove('pre'));
+}
+function apply(j,mnt){
+  const r=curRoot,sc=cur;let k=0;
+  r.querySelectorAll('[data-b]').forEach(el=>{const b=+el.dataset.b,want=b<=j,has=el.classList.contains('vis');
+    if(want&&!has){const d=(mnt?.35:.05)+(+el.dataset.d||0)+(b===j?Math.min(k++,8)*.12:0);el.style.transitionDelay=d.toFixed(2)+'s';el._p=true}
+    else if(!want){el._p=false;if(has){el.style.transitionDelay='0s';el.classList.remove('vis')}}});
+  r._j=j;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{r.querySelectorAll('[data-b]').forEach(el=>{if(el._p&&+el.dataset.b<=r._j){el.classList.add('vis');el._p=false}})}));
+  r.querySelectorAll('[data-x]').forEach(el=>el.classList.toggle('gone',j>=+el.dataset.x));
+  r.querySelectorAll('[data-hl]').forEach(el=>el.classList.toggle('hl',el.dataset.hl.split(',').map(Number).includes(j)));
+  if(sc.on){try{sc.on(j,r,mnt)}catch(e){console.error(e)}}
+}
+function go(i,tt=0,o={}){
+  i=Math.max(0,Math.min(BE.length-1,i));const b=BE[i],sc=SC[b.s];let m=false;
+  if(cur!==sc){mount(sc);m=true}
+  const same=!m&&i===g&&curRoot._j===b.j;
+  g=i;t=tt;if(!same)apply(b.j,m);
+  $('#capTag').textContent=sc.ch.title+(sc.card?'':' · '+sc.title);
+  $('#capTx').textContent=b.txt;
+  $('#chName').textContent=sc.ch.title;
+  CHS.forEach(c=>c.btn.classList.toggle('on',c===sc.ch));
+  if(playing&&voice&&o.speak!==false)say(b.txt);
+  ui();
+}
+
+/* voice */
+let esVoice=null;const hasTTS='speechSynthesis' in window;
+function pickVoice(){if(!hasTTS)return;const vs=speechSynthesis.getVoices();esVoice=vs.find(v=>/^es[-_](CL|419|MX|US|AR|CO)/i.test(v.lang))||vs.find(v=>/^es[-_]ES/i.test(v.lang))||vs.find(v=>/^es/i.test(v.lang))||null}
+if(hasTTS){pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}}else{bVoice.disabled=true;bVoice.title='Tu navegador no tiene síntesis de voz'}
+function say(txt){
+  if(!hasTTS){vDone=true;return}
+  try{speechSynthesis.cancel()}catch(e){}
+  vDone=false;const tok={};sayTok=tok;
+  const parts=(txt.match(/[^.!?]+[.!?]*/g)||[txt]).map(p=>p.trim()).filter(Boolean);
+  parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);u.lang=esVoice?esVoice.lang:'es-ES';if(esVoice)u.voice=esVoice;u.rate=Math.min(2,speed*1.05);
+    if(k===parts.length-1)u.onend=()=>{if(sayTok===tok)vDone=true};u.onerror=()=>{if(sayTok===tok)vDone=true};
+    try{speechSynthesis.speak(u)}catch(e){vDone=true}});
+  clearTimeout(vTimer);vTimer=setTimeout(()=>{if(sayTok===tok)vDone=true},(BE[g].d/speed)*1600+3000);
+}
+function hush(){if(hasTTS){sayTok=null;try{speechSynthesis.cancel()}catch(e){}}vDone=true}
+
+/* transport */
+function play(){if(!started){started=true;big.hidden=true;$('#resume').hidden=true}
+  if(g===BE.length-1&&t>=BE[g].d-.05)go(0,0,{speak:false});
+  playing=true;if(voice)say(BE[g].txt);ui()}
+function pause(){playing=false;hush();ui()}
+function next(){go(g+1,0)}
+function prev(){if(t>2.5)go(g,0);else go(g-1,0)}
+function ui(){icPlay.setAttribute('d',playing?'M6 5h4v14H6zM14 5h4v14h-4z':'M7 4.5v15l12-7.5z');bPlay.setAttribute('aria-label',playing?'Pausar':'Reproducir')}
+bPlay.onclick=()=>playing?pause():play();big.onclick=play;
+$('#bNext').onclick=next;$('#bPrev').onclick=prev;
+bSpeed.onclick=()=>{speed=SPEEDS[(SPEEDS.indexOf(speed)+1)%SPEEDS.length];bSpeed.textContent=speed+'×';if(playing&&voice)say(BE[g].txt)};
+bVoice.onclick=()=>{voice=!voice;bVoice.setAttribute('aria-pressed',voice);bVoice.textContent='Voz: '+(voice?'sí':'no');if(voice){pickVoice();if(playing)say(BE[g].txt)}else hush()};
+bFs.onclick=()=>{if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(()=>{})}else if(player.requestFullscreen){player.requestFullscreen().catch(()=>{})}};
+document.addEventListener('fullscreenchange',()=>setTimeout(fit,50));
+document.addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea'))return;
+  if(e.code==='Space'||e.key==='k'){e.preventDefault();playing?pause():play()}
+  else if(e.key==='ArrowRight'){e.preventDefault();next()}
+  else if(e.key==='ArrowLeft'){e.preventDefault();prev()}
+  else if(e.key==='f'||e.key==='F'){bFs.click()}});
+
+/* seek bar */
+function TatX(x){const r=bar.getBoundingClientRect();return Math.max(0,Math.min(1,(x-r.left)/r.width))*TOTAL}
+function seekT(T){const i=idxAt(T);go(i,Math.min(T-BE[i].st,BE[i].d-.05),{speak:false})}
+bar.addEventListener('pointerdown',e=>{dragging=true;try{bar.setPointerCapture(e.pointerId)}catch(_){};seekT(TatX(e.clientX))});
+bar.addEventListener('pointermove',e=>{const T=TatX(e.clientX);if(dragging)seekT(T);let c=CHS[0];CHS.forEach(h=>{if(h.start<=T)c=h});tip.hidden=false;tip.textContent=fmt(T)+' · '+c.title;const r=bar.getBoundingClientRect();tip.style.left=Math.max(70,Math.min(r.width-70,e.clientX-r.left))+'px'});
+bar.addEventListener('pointerup',()=>{if(dragging){dragging=false;if(playing&&voice)say(BE[g].txt)}});
+bar.addEventListener('pointerleave',()=>{tip.hidden=true});
+
+/* resume */
+let saved=0;try{saved=+localStorage.getItem(KEY)||0}catch(e){}
+if(saved>20&&saved<TOTAL-10){$('#resume').hidden=false;$('#bRes').textContent='Continuar en '+fmt(saved);
+  $('#bRes').onclick=()=>{seekT(saved);play()};$('#bRes0').onclick=()=>{seekT(0);play()}}
+
+/* fit */
+function fit(){const fs=document.fullscreenElement===player;
+  if(fs){const W=window.innerWidth,H=window.innerHeight-ctl.offsetHeight-cap.offsetHeight;frame.style.width=Math.min(W,H*16/9)+'px'}else frame.style.width='';
+  stage.style.transform=`scale(${frame.clientWidth/1280})`}
+try{new ResizeObserver(fit).observe(frame)}catch(e){window.addEventListener('resize',fit)}
+fit();
+
+/* loop */
+let last=performance.now();
+function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(playing&&!dragging){const b=BE[g];t+=dt*speed;
+    if(voice){if(vDone&&t>=1.2){if(g<BE.length-1)go(g+1,0);else pause()}else if(t>b.d)t=b.d-.001}
+    else if(t>=b.d){if(g<BE.length-1)go(g+1,t-b.d);else{t=b.d;pause()}}
+    if(now-lastSave>2500){lastSave=now;try{localStorage.setItem(KEY,String(BE[g].st+t))}catch(e){}}}
+  const b=BE[g],sc=SC[b.s];
+  if(sc.loop&&curRoot&&cur===sc){try{sc.loop(b.st-sc.start+t,curRoot,b.j,t)}catch(e){}}
+  const T=b.st+Math.min(t,b.d),p=T/TOTAL*100;fill.style.width=p+'%';knob.style.left=p+'%';
+  bar.setAttribute('aria-valuenow',Math.round(T));bar.setAttribute('aria-valuemax',Math.round(TOTAL));
+  $('#time').textContent=fmt(T)+' / '+fmt(TOTAL);
+  requestAnimationFrame(loop)}
+go(0,0,{speak:false});requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
